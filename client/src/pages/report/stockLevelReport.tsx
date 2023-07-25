@@ -33,7 +33,7 @@ const StockLevelReport: FC<Props> = ({}) => {
   });
 
   const handleDownload = async () => {
-    const API = `http://localhost:8000/api/v1/report/stockLevelReport`;
+    const API = `${process.env.REACT_APP_API_URI}/report/stockLevelReport`;
 
     const item = {
       ...parameters,

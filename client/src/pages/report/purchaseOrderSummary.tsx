@@ -29,7 +29,7 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier>();
 
   const handleDownloadDocument = async () => {
-    const API = `http://localhost:8000/api/v1/report/purchaseOrderSummary`;
+    const API = `${process.env.REACT_APP_API_URI}/report/purchaseOrderSummary`;
 
     const data = {
       ...parameters,

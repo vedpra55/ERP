@@ -14,7 +14,7 @@ const PurchaseDocument = ({}) => {
   const handleDownloadDocument = async (index: number) => {
     const orderNo = purchaseOrders[index].order_no;
 
-    const API = `http://localhost:8000/api/v1/report/purchaseDocument?orderNo=${orderNo}`;
+    const API = `${process.env.REACT_APP_API_URI}/report/purchaseDocument?orderNo=${orderNo}`;
 
     try {
       const response = await fetch(API, {
