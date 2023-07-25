@@ -33,7 +33,7 @@ const StockLevelReport: FC<Props> = ({}) => {
   });
 
   const handleDownload = async () => {
-    const API = `${process.env.VITE_API_URI}/report/stockLevelReport`;
+    const API = `${import.meta.env.VITE_API_URI}/report/stockLevelReport`;
 
     const item = {
       ...parameters,

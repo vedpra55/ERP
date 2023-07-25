@@ -29,7 +29,7 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier>();
 
   const handleDownloadDocument = async () => {
-    const API = `${process.env.VITE_API_URI}/report/purchaseOrderSummary`;
+    const API = `${import.meta.env.VITE_API_URI}/report/purchaseOrderSummary`;
 
     const data = {
       ...parameters,
