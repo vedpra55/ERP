@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
     status: "Running",
   });
 });
+
 app.use("/api/v1", apiRoutes);
 
 app.use(async (req, res, next) => {
