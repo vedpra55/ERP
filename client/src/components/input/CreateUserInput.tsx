@@ -1,11 +1,9 @@
-import { CreateUserFormValues } from "@components/system/createUser";
 import { FC } from "react";
-import { UseFormRegister } from "react-hook-form";
 
 interface Props {
   placeholder: string;
   name: string;
-  register: UseFormRegister<CreateUserFormValues>;
+  register: any;
   errorMsg?: string;
 }
 
