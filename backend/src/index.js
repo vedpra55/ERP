@@ -20,6 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // --------- Routes -----------------
 
+app.get("/", (req, res) => {
+  res.json({
+    status: "Running",
+  });
+});
 app.use("/api/v1", apiRoutes);
 
 app.use(async (req, res, next) => {
@@ -40,6 +45,7 @@ app.use(async (err, req, res, next) => {
 
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", (err) => {
+  if (err) throw err;
   console.log(`server is running: ${PORT}`);
 });
