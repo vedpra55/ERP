@@ -15,7 +15,7 @@ body {
   }
 
   .sideBarContainer {
-    @apply md:w-48 lg:w-56 2xl:w-64 fixed p-5 overflow-x-hidden  overflow-y-scroll  rounded-xl  bg-white h-[40rem]  flex flex-col items-start gap-y-5;
+    @apply md:w-48 lg:w-[15rem] 2xl:w-64 fixed p-5 overflow-x-hidden  overflow-y-scroll  rounded-xl  bg-white h-[40rem]  flex flex-col items-start gap-y-5;
   }
   .myButton {
     @apply bg-black tracking-wide  w-80 py-3 rounded-lg hover:bg-black/70 text-white  text-[14px] transition-all;

@@ -12,7 +12,7 @@ const MainApp = () => {
 
   return (
     <div className="flex my-5 px-5 gap-x-1 2xl:gap-x-5">
-      <div className=" h-screen md:w-[20%] lg:w-1/5 2xl:w-64 ">
+      <div className=" h-screen md:w-[20%] w-56 lg:w-64 ">
         {company && subCompany && programs && (
           <SideBar
             company={company}
@@ -22,7 +22,7 @@ const MainApp = () => {
         )}
       </div>
       <div className="bg-white flex-1 rounded-xl    p-10  h-auto ">
-        <div className="md:w-[40rem] lg:w-[45rem] xl:w-[59rem] 2xl:w-[65rem] flex-shrink-0 ">
+        <div className="md:w-[37rem] lg:w-[42rem] xl:w-[55rem] 2xl:w-[70rem] flex-shrink-0 ">
           <Outlet />
         </div>
       </div>
