@@ -1,4 +1,4 @@
-import { FC, RefObject } from "react";
+import { FC } from "react";
 import { PulseLoader } from "react-spinners";
 
 interface Props {

@@ -3,7 +3,7 @@ import useApiServices from "@api/query";
 import CategoryForm, { departmentForm } from "@components/form/CategoryForm";
 import AppButton from "@components/ui/AppButton";
 import BackButton from "@components/ui/BackButton";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useParams } from "react-router-dom";
 
 const EditCategoryPage = () => {

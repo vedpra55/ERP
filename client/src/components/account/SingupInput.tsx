@@ -1,17 +1,9 @@
 import { FC } from "react";
-import { UseFormRegister } from "react-hook-form";
-
-type FormValues = {
-  username: string;
-  email: string;
-  password: string;
-  companyName: string;
-};
 
 interface Props {
   placeholder: string;
   name: string;
-  register: UseFormRegister<FormValues>;
+  register: any;
   errorMsg?: string;
 }
 

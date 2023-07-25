@@ -10,7 +10,7 @@ const AssignPrograms = ({}) => {
 
   const [isOpenModal, setModalOpen] = useState(false);
   const [check, setCheck] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
 
   const { updateUserRoleProgramAccess } = useCreateMution();
 
