@@ -78,6 +78,8 @@ const RoutesManagment: FC<Props> = ({ user }) => {
     return false;
   };
 
+  console.log(programs);
+
   return (
     <main className=" font-roboto container max-w-screen-2xl mx-auto">
       <Routes>
