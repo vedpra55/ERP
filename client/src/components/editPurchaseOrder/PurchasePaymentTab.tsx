@@ -25,7 +25,7 @@ const PurchasePayment: FC<Props> = ({
   purchaseOrder,
   subTotal,
 }) => {
-  const total = parseInt(purchaseOrder.freight.toString()) + subTotal;
+  const total = purchaseOrder.order_amount;
   const nonVendorCostValue = (purchaseOrder.non_vendor_cost / 100) * total;
   const orderDate = new Date(purchaseOrder.order_dt);
   const dueDate = new Date(purchaseOrder.eta);
