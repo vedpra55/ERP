@@ -1,7 +1,7 @@
 import { useAuthContext } from "@context/AuthContext";
 import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
-import RoutesManagment from "./routesManagement";
+
 import { Route, Routes } from "react-router-dom";
 import CreateAccount from "@pages/account/createAccount";
 import Signin from "@pages/account/signin";
@@ -29,15 +29,11 @@ function App() {
 
   return (
     <>
-      {user?.email ? (
-        <RoutesManagment user={user} />
-      ) : (
-        <Routes>
-          <Route path="/" element={<UnAuthHome />} />
-          <Route path="/account/create-account" element={<CreateAccount />} />
-          <Route path="/account/signin" element={<Signin />} />
-        </Routes>
-      )}
+      <Routes>
+        <Route path="/" element={<UnAuthHome />} />
+        <Route path="/account/create-account" element={<CreateAccount />} />
+        <Route path="/account/signin" element={<Signin />} />
+      </Routes>
     </>
   );
 }

@@ -107,27 +107,21 @@ const RoutesManagment: FC<Props> = ({ user }) => {
           <Route />
 
           <Route path="master">
-            {programAccess.isCategories && (
-              <Route path="categories/*" element={<CategoryPage />} />
-            )}
-            {programAccess.isLocations && (
-              <Route path="locations/*" element={<LocationPage />} />
-            )}
-            {programAccess.isSuppliers && (
-              <Route path="suppliers/*" element={<SupplierPage />} />
-            )}
-            {programAccess.isProducts && (
-              <Route path="products/*" element={<ProductPage />} />
-            )}
+            <Route path="categories/*" element={<CategoryPage />} />
+
+            <Route path="locations/*" element={<LocationPage />} />
+
+            <Route path="suppliers/*" element={<SupplierPage />} />
+
+            <Route path="products/*" element={<ProductPage />} />
           </Route>
 
           <Route path="transaction">
-            {programAccess.pod && (
-              <Route
-                path="purchase-order-creation/*"
-                element={<PurchaseOrderPage />}
-              />
-            )}
+            <Route
+              path="purchase-order-creation/*"
+              element={<PurchaseOrderPage />}
+            />
+
             {programAccess.tc && (
               <Route
                 path="transfer-creation/*"
