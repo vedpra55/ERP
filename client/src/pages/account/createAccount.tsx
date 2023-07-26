@@ -8,6 +8,8 @@ import { User, useAuthContext } from "@context/AuthContext";
 import { toast } from "react-hot-toast";
 import { catchAsyncError } from "@api/catchError";
 import client from "@api/client";
+import { PulseLoader } from "react-spinners";
+import { useState } from "react";
 
 type FormValues = {
   username: string;
@@ -26,19 +28,19 @@ const CreateAccount = () => {
     resolver: yupResolver(signupSchema),
   });
 
+  const [isLoading, setLoading] = useState(false);
   const { dispatch } = useAuthContext();
 
   const singup = async (formData: FormValues) => {
+    setLoading(true);
     try {
-      dispatch({ type: "LOADING" });
-
       const { data } = await client.post(`/system/auth/register`, formData);
 
       const user: User = data?.res;
 
-      dispatch({ type: "REGISTER", payload: user });
+      console.log(user);
 
-      toast.success("Account Created. Please Verify The Email");
+      toast.success("Account Created. Please Verify The Email & Sign In");
 
       reset({
         companyName: "",
@@ -52,6 +54,8 @@ const CreateAccount = () => {
       toast.error(message.message);
       console.log(err);
     }
+
+    setLoading(false);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -89,7 +93,7 @@ const CreateAccount = () => {
           register={register}
         />
         <button className="myButton" type="submit">
-          Submit
+          {isLoading ? <PulseLoader color="white" /> : "Submit"}
         </button>
 
         <Link
