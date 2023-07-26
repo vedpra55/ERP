@@ -8,6 +8,7 @@ interface Props {
   name: string;
   errMsg?: string;
   extraValAccessor?: string;
+  isShowSelect?: boolean;
 }
 
 interface Props2 {
@@ -29,6 +30,7 @@ const SelectInput: FC<Props> = ({
   label,
   register,
   errMsg,
+  isShowSelect,
 }) => {
   const [val, setVal] = useState("");
 
@@ -38,12 +40,14 @@ const SelectInput: FC<Props> = ({
         <p className=" text-[14px] text-red-400 tracking-normal">{errMsg}</p>
       )}
       <label className="text-[14px] tracking-wider ">{label}</label>
+
       <select
         onChange={(e) => setVal(e.target.value)}
         name={name}
         className="border  rounded-md 2x:w-80 px-5 py-2 outline-none"
         {...register(name)}
       >
+        {isShowSelect && <option>Select</option>}
         {data.map((item) =>
           extraValAccessor ? (
             <option value={item[accessor]} key={item[accessor]}>

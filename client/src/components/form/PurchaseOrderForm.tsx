@@ -89,6 +89,7 @@ const PurchaseOrderForm: FC<Props> = ({
         errorMsg={errors.orderNo?.message}
       />
       <SelectInput
+        isShowSelect
         accessor="supplier_code"
         data={suppliers}
         label="Supplier Code"
