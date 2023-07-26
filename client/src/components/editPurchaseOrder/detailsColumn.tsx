@@ -30,14 +30,14 @@ const DetailsColumn: FC<Props> = ({ purchaseOrderDetails }) => {
     },
     {
       header: "Unit Price",
-      accessor: "cost_local",
+      accessor: "cost_fc",
       colSpan: "col-span-2",
     },
     {
       header: "Value",
       accessor: "value",
       field: "qty_ordered",
-      field2: "cost_local",
+      field2: "cost_fc",
       colSpan: "col-span-2",
     },
   ];
