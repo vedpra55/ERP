@@ -9,6 +9,7 @@ interface Props {
   transferDetailsRow: TransferDetails[];
   setTransferDetailsRow: any;
   fromLocation: string;
+  setStoreQtyLess: any;
 }
 
 const SelectTransferDetails: FC<Props> = ({
@@ -17,6 +18,7 @@ const SelectTransferDetails: FC<Props> = ({
   transferDetailsRow,
   setTransferDetailsRow,
   fromLocation,
+  setStoreQtyLess,
 }) => {
   const handleInputChange = (e: any, index: number) => {
     const { value, name } = e.target;
@@ -73,6 +75,7 @@ const SelectTransferDetails: FC<Props> = ({
       <Header />
       {transferDetailsRow.map((_, index) => (
         <SelectTransferRow
+          setStoreQtyLess={setStoreQtyLess}
           transferDetails={transferDetailsRow}
           products={products}
           categories={categories}

@@ -14,6 +14,7 @@ interface Props {
   removeRow(index: number): void;
   transferDetails: TransferDetails[];
   fromLocation?: string;
+  setStoreQtyLess: any;
 }
 
 const SelectTransferRow: FC<Props> = ({
@@ -24,6 +25,7 @@ const SelectTransferRow: FC<Props> = ({
   handleInputChange,
   removeRow,
   fromLocation,
+  setStoreQtyLess,
 }) => {
   const [filterProducts, setFilterProduct] = useState<Product[]>();
 
@@ -62,8 +64,10 @@ const SelectTransferRow: FC<Props> = ({
           setErrorMsg(
             `Store qty is ${storeQty.qty_instock}. Please enter the qty in this range`
           );
+          setStoreQtyLess(true);
         } else {
           setErrorMsg("");
+          setStoreQtyLess(false);
         }
       }
     }

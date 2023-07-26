@@ -29,6 +29,7 @@ const CreateTransferPage: FC<Props> = ({}) => {
   const { data: products } = useFetchProducts();
   const { data: categories } = useFetchCategories();
   const [transferNo, setTransferNo] = useState<string>("");
+  const [isStoreQtyLess, setStoreQtyLess] = useState(false);
 
   const [transferDetailsRow, setTransferDetailsRow] = useState<
     TransferDetails[]
@@ -66,6 +67,10 @@ const CreateTransferPage: FC<Props> = ({}) => {
       ) {
         return toast.error("Please Enter Products Row");
       }
+    }
+
+    if (isStoreQtyLess) {
+      return toast.error("Please check qty it is more then store qty");
     }
 
     const item = {
@@ -111,6 +116,7 @@ const CreateTransferPage: FC<Props> = ({}) => {
         locations={locations}
       />
       <SelectTransferDetails
+        setStoreQtyLess={setStoreQtyLess}
         setTransferDetailsRow={setTransferDetailsRow}
         transferDetailsRow={transferDetailsRow}
         products={products}

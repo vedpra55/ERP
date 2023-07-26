@@ -97,9 +97,9 @@ const PurchaseOrderTab: FC<Props> = ({
               {orderDate.getFullYear()}
             </p>
           </div>
-          <div className="flex items-center gap-x-10">
+          <div className="flex items-center gap-x-10 mt-5">
             {purchaseOrder.fulfilled_flag ? (
-              <p className="mt-5 font-medium text-green-700 border px-5 py-2 rounded-md">
+              <p className=" font-medium text-green-700 border px-5 py-2 rounded-md">
                 Full Filled
               </p>
             ) : (

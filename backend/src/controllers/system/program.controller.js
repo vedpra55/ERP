@@ -86,7 +86,7 @@ export const getCompanyRoleProgram = async (req, res, next) => {
     const { user } = req.body;
 
     if (!subCompanyId) {
-      next(createHttpError.BadRequest("No subcompany id found"));
+      return next(createHttpError.BadRequest("No subcompany id found"));
     }
 
     const rolePrograms = await Prisma.sys_roleprograms.findMany({
