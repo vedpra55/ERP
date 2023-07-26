@@ -6,6 +6,7 @@ import {
   signin,
   updateUserRole,
   verifyLoggedinUser,
+  verifyEmail,
 } from "../../controllers/system/auth.controller.js";
 import {
   verifyAdminToken,
@@ -20,5 +21,6 @@ router.post("/createUser", verifyAdminToken, createUserByAdmin);
 router.put("/updateRole", verifyAdminToken, updateUserRole);
 router.get("/subCompanyUsers", verifyAdminToken, getUsersBySubCompany);
 router.post("/verifyUser", verifyToken, verifyLoggedinUser);
+router.get("/verify", verifyEmail);
 
 export default router;

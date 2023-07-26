@@ -2,15 +2,20 @@ import createHttpError from "http-errors";
 import Prisma from "../../../prisma/index.js";
 import { comparePassword, hashPassword } from "../../utils/hashPassword.js";
 import generateAuthToken from "../../utils/generateToken.js";
+import randomstring from "randomstring";
+import nodemailer from "nodemailer";
 
 export const register = async (req, res, next) => {
-  try {
-    const { email, password, username, companyName } = req.body;
+  const { email, password, username, companyName } = req.body;
 
+  let cid = 0;
+
+  try {
     if (!email || !password || !username || !companyName) {
       next(createHttpError.BadRequest("Please Fill all fields"));
     }
 
+    const verificationToken = randomstring.generate(10);
     await Prisma.$transaction(async (Prisma) => {
       // check Company name exits
       const isNameExit = await Prisma.gl_companies.findUnique({
@@ -40,6 +45,8 @@ export const register = async (req, res, next) => {
           company_name: companyName,
         },
       });
+
+      cid = company.company_id;
 
       // Create Sub company
       const subCompany = await Prisma.gl_sub_companies.create({
@@ -166,7 +173,7 @@ export const register = async (req, res, next) => {
       const hashedPassword = hashPassword(password);
 
       // Create the user
-      await Prisma.sys_users.create({
+      const user = await Prisma.sys_users.create({
         data: {
           email,
           password: hashedPassword,
@@ -175,6 +182,7 @@ export const register = async (req, res, next) => {
           sub_company_id: subCompany.sub_company_id,
           role_name: adminRole.role_name,
           verified: false,
+          verificationToken,
         },
       });
 
@@ -182,6 +190,10 @@ export const register = async (req, res, next) => {
         message: "Account Created. Please verify the email",
       });
     });
+
+    if (cid != 0) {
+      await sendVerificationEmail(email, username, cid, verificationToken);
+    }
   } catch (err) {
     console.log(err);
     next(err);
@@ -383,6 +395,75 @@ export const verifyLoggedinUser = async (req, res, next) => {
       },
     });
   } catch (err) {
+    next(err);
+  }
+};
+
+export const sendVerificationEmail = async (email, name, cId, token) => {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    requireTLS: true,
+    auth: {
+      user: "vedna400@gmail.com",
+      pass: "byjlopizjtlnzpqw",
+    },
+  });
+
+  const mailOptions = {
+    from: "vedna400@gmail.com",
+    to: email,
+    subject: "Email Verification",
+    html: `
+    <html>
+    <style></style>
+      <body>
+        <h3>Please click on the following link to verify your email: </h3>
+        <a href=http://localhost:8000/api/v1/system/auth/verify?token=${token}&name=${name}&companyId=${cId}>Verify</a>
+      </body>
+    </html>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { token, name, companyId } = req.query;
+
+    const user = await Prisma.sys_users.findFirst({
+      where: {
+        verificationToken: token,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Invalid verification token." });
+    }
+
+    if (user.verified) {
+      return res.status(200).json({ message: "Email is already verified" });
+    }
+
+    // Update the user's emailVerified status
+    await Prisma.sys_users.update({
+      where: {
+        company_id_sub_company_id_username: {
+          company_id: parseInt(companyId),
+          sub_company_id: 1,
+          username: name,
+        },
+      },
+      data: {
+        verified: true,
+      },
+    });
+
+    res.json({ message: "Email verified successfully." });
+  } catch (err) {
+    console.log(err);
     next(err);
   }
 };
