@@ -1,5 +1,5 @@
 import { useAuthContext } from "@context/AuthContext";
-
+import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import RoutesManagment from "./routesManagement";
 import { Route, Routes } from "react-router-dom";
@@ -9,8 +9,15 @@ import UnAuthHome from "@pages/home/unAuthHome";
 
 function App() {
   const { isLoading, user } = useAuthContext();
+  const [isAuthReady, setAuthReady] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) {
+      setAuthReady(true);
+    }
+  }, [isLoading]);
+
+  if (isLoading || !isAuthReady) {
     return (
       <div className=" h-screen w-full flex justify-center items-center">
         <FadeLoader className="text-gray-500" />
