@@ -81,77 +81,69 @@ const RoutesManagment: FC<Props> = ({ user }) => {
   console.log(programs);
 
   return (
-    <main className=" font-roboto container max-w-screen-2xl mx-auto">
-      <Routes>
-        {/* Catch-all route for 404 */}
-        {programs && actionComplete && (
-          <Route path="*" element={<NotFoundPage />} />
-        )}
-        <Route path="/" element={<Home />} />
-        <Route
-          path="app"
-          element={
-            user.access_token != "" ? (
-              <MainApp />
-            ) : (
-              <p className="text-center mt-20">Please Login</p>
-            )
-          }
-        >
-          <Route path="system">
-            <Route path="create-roles" element={<CreateRoles />} />
-            <Route path="create-users" element={<CreateUser />} />
-            <Route path="create-sub-company" element={<CreateSubCompany />} />
-            <Route path="assign-programs" element={<AssignPrograms />} />
-          </Route>
-          <Route />
-
-          <Route path="master">
-            <Route path="categories/*" element={<CategoryPage />} />
-
-            <Route path="locations/*" element={<LocationPage />} />
-
-            <Route path="suppliers/*" element={<SupplierPage />} />
-
-            <Route path="products/*" element={<ProductPage />} />
-          </Route>
-
-          <Route path="transaction">
-            <Route
-              path="purchase-order-creation/*"
-              element={<PurchaseOrderPage />}
-            />
-
-            {programAccess.tc && (
-              <Route
-                path="transfer-creation/*"
-                element={<StockTransferPage />}
-              />
-            )}
-          </Route>
-
-          <Route path="report">
-            {programAccess.pd && (
-              <Route path="purchase-document" element={<PurchaseDocument />} />
-            )}
-
-            {programAccess.td && (
-              <Route
-                path="transfer-document"
-                element={<PurchaseOrderSummary />}
-              />
-            )}
-
-            {programAccess.sbr && (
-              <Route
-                path="stock-balance-report"
-                element={<StockLevelReport />}
-              />
-            )}
-          </Route>
+    <Routes>
+      {/* Catch-all route for 404 */}
+      {programs && actionComplete && (
+        <Route path="*" element={<NotFoundPage />} />
+      )}
+      <Route path="/" element={<Home />} />
+      <Route
+        path="app"
+        element={
+          user.access_token != "" ? (
+            <MainApp />
+          ) : (
+            <p className="text-center mt-20">Please Login</p>
+          )
+        }
+      >
+        <Route path="system">
+          <Route path="create-roles" element={<CreateRoles />} />
+          <Route path="create-users" element={<CreateUser />} />
+          <Route path="create-sub-company" element={<CreateSubCompany />} />
+          <Route path="assign-programs" element={<AssignPrograms />} />
         </Route>
-      </Routes>
-    </main>
+        <Route />
+
+        <Route path="master">
+          <Route path="categories/*" element={<CategoryPage />} />
+
+          <Route path="locations/*" element={<LocationPage />} />
+
+          <Route path="suppliers/*" element={<SupplierPage />} />
+
+          <Route path="products/*" element={<ProductPage />} />
+        </Route>
+
+        <Route path="transaction">
+          <Route
+            path="purchase-order-creation/*"
+            element={<PurchaseOrderPage />}
+          />
+
+          {programAccess.tc && (
+            <Route path="transfer-creation/*" element={<StockTransferPage />} />
+          )}
+        </Route>
+
+        <Route path="report">
+          {programAccess.pd && (
+            <Route path="purchase-document" element={<PurchaseDocument />} />
+          )}
+
+          {programAccess.td && (
+            <Route
+              path="transfer-document"
+              element={<PurchaseOrderSummary />}
+            />
+          )}
+
+          {programAccess.sbr && (
+            <Route path="stock-balance-report" element={<StockLevelReport />} />
+          )}
+        </Route>
+      </Route>
+    </Routes>
   );
 };
 
