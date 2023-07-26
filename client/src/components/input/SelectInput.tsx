@@ -9,6 +9,7 @@ interface Props {
   errMsg?: string;
   extraValAccessor?: string;
   isShowSelect?: boolean;
+  closeCheck?: boolean;
 }
 
 interface Props2 {
@@ -20,6 +21,7 @@ interface Props2 {
   errMsg?: string;
   optionl?: string;
   extraValAccessor?: string;
+  closeCheck?: boolean;
 }
 
 const SelectInput: FC<Props> = ({
@@ -31,6 +33,7 @@ const SelectInput: FC<Props> = ({
   register,
   errMsg,
   isShowSelect,
+  closeCheck,
 }) => {
   const [val, setVal] = useState("");
 
@@ -49,7 +52,18 @@ const SelectInput: FC<Props> = ({
       >
         {isShowSelect && <option>Select</option>}
         {data.map((item) =>
-          extraValAccessor ? (
+          closeCheck ? (
+            !item.closed_flag &&
+            (extraValAccessor ? (
+              <option value={item[accessor]} key={item[accessor]}>
+                {item[accessor]} - {item[extraValAccessor]}
+              </option>
+            ) : (
+              <option value={item[accessor]} key={item[accessor]}>
+                {item[accessor]}
+              </option>
+            ))
+          ) : extraValAccessor ? (
             <option value={item[accessor]} key={item[accessor]}>
               {item[accessor]} - {item[extraValAccessor]}
             </option>
@@ -74,6 +88,7 @@ export const SelecteInputNormal: FC<Props2> = ({
   errMsg,
   optionl,
   extraValAccessor,
+  closeCheck,
 }) => {
   return (
     <div className="col-span-4 flex flex-col gap-y-2">
@@ -89,7 +104,18 @@ export const SelecteInputNormal: FC<Props2> = ({
         <option>Select</option>
         {optionl && <option>{optionl}</option>}
         {data.map((item) =>
-          extraValAccessor ? (
+          closeCheck ? (
+            !item.closed_flag &&
+            (extraValAccessor ? (
+              <option value={item[accessor]} key={item[accessor]}>
+                {item[accessor]} - {item[extraValAccessor]}
+              </option>
+            ) : (
+              <option value={item[accessor]} key={item[accessor]}>
+                {item[accessor]}
+              </option>
+            ))
+          ) : extraValAccessor ? (
             <option value={item[accessor]} key={item[accessor]}>
               {item[accessor]} - {item[extraValAccessor]}
             </option>

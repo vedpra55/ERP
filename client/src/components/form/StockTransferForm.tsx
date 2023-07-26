@@ -69,6 +69,7 @@ const StockTransferForm: FC<Props> = ({
       className="grid grid-cols-12 gap-5 items-end mt-5"
     >
       <SelectInput
+        closeCheck
         extraValAccessor="location_name"
         data={locations}
         accessor="location_code"
@@ -78,6 +79,7 @@ const StockTransferForm: FC<Props> = ({
         errMsg={sameLocErrMsg}
       />
       <SelectInput
+        closeCheck
         extraValAccessor="location_name"
         data={locations}
         accessor="location_code"

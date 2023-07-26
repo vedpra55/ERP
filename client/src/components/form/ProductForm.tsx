@@ -57,10 +57,6 @@ const ProductForm: FC<Props> = ({
     }
   }, [defaultValues]);
 
-  const filterCategories = categories.map((item: any) => {
-    if (!item.closed_flag) return item;
-  });
-
   return (
     <form
       onSubmit={handleSubmit((data) => handleSubmitForm(data))}
@@ -68,20 +64,16 @@ const ProductForm: FC<Props> = ({
     >
       {!defaultValues && (
         <>
-          {filterCategories[0] != undefined ? (
-            <SelectInput
-              accessor="department_code"
-              name="departmentCode"
-              label="Department Code"
-              extraValAccessor="department_name"
-              register={register}
-              data={filterCategories}
-            />
-          ) : (
-            <div className="col-span-4 border py-2 px-5 rounded-md tracking-wider">
-              No Department code found
-            </div>
-          )}
+          <SelectInput
+            accessor="department_code"
+            name="departmentCode"
+            label="Department Code"
+            extraValAccessor="department_name"
+            register={register}
+            closeCheck
+            data={categories}
+          />
+
           <AppInput
             name="productCode"
             placeholder="Product Name"

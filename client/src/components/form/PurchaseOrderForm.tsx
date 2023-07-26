@@ -88,6 +88,7 @@ const PurchaseOrderForm: FC<Props> = ({
         register={register}
         errorMsg={errors.orderNo?.message}
       />
+
       <SelectInput
         isShowSelect
         accessor="supplier_code"
@@ -96,7 +97,9 @@ const PurchaseOrderForm: FC<Props> = ({
         extraValAccessor="supplier_name"
         name="supplierCode"
         register={register}
+        closeCheck
       />
+
       <SelectedValue
         value={selectedSupplier?.supplier_code}
         title="Supplier Code"
@@ -116,6 +119,7 @@ const PurchaseOrderForm: FC<Props> = ({
         label="Location Code"
         name="locationCode"
         register={register}
+        closeCheck
       />
       <SelectedValue
         value={selectedLocation?.location_name}
