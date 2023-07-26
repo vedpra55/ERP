@@ -71,6 +71,7 @@ const CreateTransferPage: FC<Props> = ({}) => {
     const item = {
       ...data,
       products: transferDetailsRow,
+      transferNo: transferNo,
     };
     await createStockTransferMutation.mutateAsync(item);
     setTransferDetailsRow([

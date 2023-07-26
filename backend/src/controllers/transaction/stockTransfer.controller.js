@@ -29,7 +29,7 @@ export const createStockTransfer = async (req, res, next) => {
           from_location: fromLocation,
           to_location: toLocation,
           transfer_dt: new Date(),
-          transfer_no: transferNo,
+          transfer_no: transferNo.toString(),
           remarks: remarks,
           created_on: new Date(),
           created_by: user.username,
@@ -42,7 +42,7 @@ export const createStockTransfer = async (req, res, next) => {
           sub_company_id: user.sub_company_id,
           from_location: fromLocation,
           to_location: toLocation,
-          sequence_number: transferNo,
+          sequence_number: transferNo.toString(),
         },
       });
 
@@ -51,7 +51,7 @@ export const createStockTransfer = async (req, res, next) => {
           data: {
             company_id: user.company_id,
             sub_company_id: user.sub_company_id,
-            transfer_no: transferNo,
+            transfer_no: transferNo.toString(),
             serial_no: parseInt(products[i].srl),
             department_code: products[i].departmentCode,
             product_code: products[i].productCode,
