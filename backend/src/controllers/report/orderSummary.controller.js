@@ -6,8 +6,6 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
   try {
     const { supplierCode, poDate, poToDate, status, user } = req.body;
 
-    console.log(poDate);
-
     let summary;
 
     const company = await Prisma.gl_companies.findUnique({
@@ -50,6 +48,29 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
         purchaseOrder: order,
         purchaseOrderDetails: purchaseOrderDetails2 || [],
       };
+    });
+
+    let reportTotal = 0;
+
+    summary.map((item) => {
+      item.purchaseOrderDetails.map((po) => {
+        reportTotal += po.cost_fc * po.qty_ordered;
+      });
+    });
+
+    const subtotalByOrder = {};
+
+    // Calculate subtotal for each purchase order
+    summary.forEach((item) => {
+      const orderNumber = item.purchaseOrder.order_no;
+      const orderAmount = parseFloat(item.purchaseOrder.order_amount);
+
+      if (subtotalByOrder[orderNumber]) {
+        subtotalByOrder[orderNumber] +=
+          orderAmount - item.purchaseOrder.freight;
+      } else {
+        subtotalByOrder[orderNumber] = orderAmount - item.purchaseOrder.freight;
+      }
     });
 
     //const products = [];
@@ -175,7 +196,7 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
           <div>
             ${summary
               .map(
-                (item, i) =>
+                (item, index) =>
                   `
                 <div class="grid-container">
                 <div style="background-color: #f2f2f2" class="grid-item smallest">
@@ -244,13 +265,22 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
                 <div class="grid-container3">
               <div class="grid-item"></div>
               <div style="text-align: center" class="grid-item">Total</div>
-              <div class="grid-item">1,60,000</div>
+              <div class="grid-item">${
+                subtotalByOrder[item.purchaseOrder.order_no]
+              }</div>
                 `}
             </div>
-    
                 `
               )
               .join("")}
+
+                ${`
+                <div class="grid-container3">
+              <div class="grid-item"></div>
+              <div style="text-align: center" class="grid-item">Report Total</div>
+              <div class="grid-item">${reportTotal}</div>
+                `}
+            </div>
     
         </main>
       </body>
