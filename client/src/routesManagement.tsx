@@ -78,8 +78,6 @@ const RoutesManagment: FC<Props> = ({ user }) => {
     return false;
   };
 
-  console.log(programs);
-
   return (
     <Routes>
       {/* Catch-all route for 404 */}
