@@ -98,6 +98,7 @@ export const purchaseOrderPdf = async (req, res, next) => {
           }
     
           .grid-item {
+            background : red
             font-size: 12px;
             padding: 10px;
             border: 1px solid;
@@ -162,7 +163,7 @@ export const purchaseOrderPdf = async (req, res, next) => {
             </section>
           </section>
           <div class="grid-container">
-            <div style="background-color: #f2f2f2" class="grid-item smallest">
+            <div style="background-color: red" class="grid-item smallest">
               Srl
             </div>
             <div style="background-color: #f2f2f2" class="grid-item">
