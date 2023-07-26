@@ -325,7 +325,7 @@ model sys_users {
   verified              Boolean?
   role_name             String                  @db.VarChar(255)
   id                    Int                     @default(autoincrement())
-  verificationToken     String                  @unique
+  verificationToken     String?
   inv_cardex            inv_cardex[]
   inv_department        inv_department[]
   inv_product_suppliers inv_product_suppliers[]
