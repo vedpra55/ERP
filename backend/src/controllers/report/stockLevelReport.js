@@ -197,6 +197,9 @@ export const StockLevelReport = async (req, res, next) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
+    html {
+      -webkit-print-color-adjust: exact;
+    }
       body,
       h1,
       h2,

@@ -51,6 +51,9 @@ export const purchaseOrderPdf = async (req, res, next) => {
         <title>Document</title>
     
         <style>
+        html {
+          -webkit-print-color-adjust: exact;
+        }
           body,
           h1,
           h2,
@@ -59,8 +62,10 @@ export const purchaseOrderPdf = async (req, res, next) => {
           p {
             padding: 0;
             margin: 0;
+     
           }
           .mainContainer {
+          
             margin-left: 50px;
             margin-right: 50px;
           }
@@ -98,7 +103,7 @@ export const purchaseOrderPdf = async (req, res, next) => {
           }
     
           .grid-item {
-            background : red
+
             font-size: 12px;
             padding: 10px;
             border: 1px solid;
@@ -163,7 +168,7 @@ export const purchaseOrderPdf = async (req, res, next) => {
             </section>
           </section>
           <div class="grid-container">
-            <div style="background-color: red" class="grid-item smallest">
+            <div style="background-color: #f2f2f2" class="grid-item smallest">
               Srl
             </div>
             <div style="background-color: #f2f2f2" class="grid-item">
