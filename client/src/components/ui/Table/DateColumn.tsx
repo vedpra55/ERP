@@ -9,9 +9,13 @@ const DateColumn: FC<Props> = ({ date }) => {
 
   return (
     <div>
-      <p className="text-[14px]">
-        {ds.getDate()} / {ds.getMonth()} / {ds.getFullYear()}
-      </p>
+      {date ? (
+        <p className="text-[14px]">
+          {ds.getDate()} / {ds.getMonth()} / {ds.getFullYear()}
+        </p>
+      ) : (
+        <p className="text-[14px] text-red-500">Not Acknowledge</p>
+      )}
     </div>
   );
 };

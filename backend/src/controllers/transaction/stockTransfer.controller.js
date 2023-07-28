@@ -36,15 +36,29 @@ export const createStockTransfer = async (req, res, next) => {
         },
       });
 
-      await Prisma.inv_transfer_sequences.create({
-        data: {
-          company_id: user.company_id,
-          sub_company_id: user.sub_company_id,
-          from_location: fromLocation,
-          to_location: toLocation,
-          sequence_number: transferNo.toString(),
-        },
-      });
+      const is_transfer_sequencesExit =
+        await Prisma.inv_transfer_sequences.findUnique({
+          where: {
+            company_id_sub_company_id_from_location_to_location: {
+              company_id: user.company_id,
+              sub_company_id: user.sub_company_id,
+              from_location: fromLocation,
+              to_location: toLocation,
+            },
+          },
+        });
+
+      if (!is_transfer_sequencesExit) {
+        await Prisma.inv_transfer_sequences.create({
+          data: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            from_location: fromLocation,
+            to_location: toLocation,
+            sequence_number: transferNo.toString(),
+          },
+        });
+      }
 
       for (let i = 0; i < products.length; i++) {
         await Prisma.inv_transfer_detail.create({
