@@ -27,8 +27,11 @@ const AddPayments: FC<Props> = ({
   useEffect(() => {
     let val = 0;
     for (let i = 0; i < paymentDetails.length; i++) {
-      if (paymentDetails[i].amount) {
-        val += parseFloat(paymentDetails[i].amount.toString());
+      if (paymentDetails) {
+        const amount = paymentDetails[i].amount;
+        if (amount) {
+          val += parseFloat(amount.toString());
+        }
       }
     }
     setSubAmount(val);

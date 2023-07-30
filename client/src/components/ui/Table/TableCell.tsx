@@ -1,4 +1,3 @@
-import { FC } from "react";
 import AccessStatus from "./AccessStatus";
 import ActonColumn from "./ActionColumn";
 
@@ -142,7 +141,3 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
 };
 
 export default TableCell;
-
-const Value: FC<{ val: number }> = ({ val }) => {
-  return <p>{val}</p>;
-};
