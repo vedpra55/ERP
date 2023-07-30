@@ -104,15 +104,15 @@ const PurchasePayment: FC<Props> = ({
             title="Due Amount"
           />
         </div>
-        <div className="col-span-4 p-5 border rounded-md h-40">
-          <div className="flex font-medium text-lg items-center gap-x-10">
+        <div className="col-span-4 p-5 border rounded-md h-56 2xl:h-40">
+          <div className="flex font-medium text-[14px] 2xl:text-lg items-center gap-x-10">
             <p className="w-28">Order Date</p>
             <p>
               {orderDate.getDate()} / {orderDate.getMonth()} /{" "}
               {orderDate.getFullYear()}
             </p>
           </div>
-          <div className="flex mt-2 font-medium text-lg items-center gap-x-10">
+          <div className="flex mt-2 font-medium text-[14px] 2xl:text-lg items-center gap-x-10">
             <p className="w-28">Due Date</p>
             <p>
               {dueDate.getDate()} / {dueDate.getMonth()} /{" "}

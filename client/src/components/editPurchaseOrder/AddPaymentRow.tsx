@@ -17,28 +17,31 @@ const AddPaymentRow: FC<Props> = ({
   values,
 }) => {
   return (
-    <div className="grid grid-cols-12 items-center mb-5 gap-x-3 px-10 py-2 border-b">
+    <div className="grid text-[14px] 2xl:text-base grid-cols-12 items-center mb-5 gap-x-3 px-10 py-2 border-b">
       <div className="col-span-1">{srl || ""}</div>
       <input
         name="date"
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2 border px-2 py-2 w-36 rounded-md outline-none"
+        className="col-span-3 2xl:col-span-2 border px-2 py-2 w-36 rounded-md outline-none"
         type="date"
       />
       <input
         name="amount"
         value={values[index].amount}
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2 border px-2 py-2 w-28 rounded-md outline-none"
+        className="col-span-3 2xl:col-span-2  border px-2 py-2 w-28 rounded-md outline-none"
         type="number"
       />
       <textarea
         name="remarks"
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-3 w-56 border px-2 py-2  rounded-md outline-none"
+        className="col-span-3   2xl:w-56 border px-2 py-2  rounded-md outline-none"
         rows={1}
       />
-      <div onClick={() => removeRow(index)} className="text-lg cursor-pointer">
+      <div
+        onClick={() => removeRow(index)}
+        className="col-span-2 text-lg cursor-pointer"
+      >
         <IoCloseSharp />
       </div>
     </div>

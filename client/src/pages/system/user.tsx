@@ -25,13 +25,17 @@ const SystemUser: FC<Props> = ({}) => {
   };
 
   const createdUserColumn: TableColumn[] = [
-    { header: "User Name", accessor: "username", colSpan: "col-span-2" },
+    {
+      header: "User Name",
+      accessor: "username",
+      colSpan: "2xl:col-span-2 md:col-span-3",
+    },
     { header: "Email", accessor: "email", colSpan: "col-span-2" },
     { header: "Role", accessor: "role_name", colSpan: "col-span-2" },
     {
       header: "Sub Company Id",
       accessor: "sub_company_id",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
     },
     {
       header: "Action",

@@ -51,7 +51,7 @@ const Main = ({}) => {
   ];
 
   return (
-    <div>
+    <div className="screenWidth">
       <Link className="myButton px-3 py-2 text-xs" to={"create"}>
         Create Purchase Order
       </Link>

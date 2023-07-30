@@ -119,11 +119,11 @@ export default AddPayments;
 const Header = () => {
   return (
     <div className="grid grid-cols-12 gap-x-2 bg-gray-100 py-3 px-10 text-[14px] font-medium rounded-md">
-      <div className="col-span-1">Srl</div>
-      <div className="col-span-2">Date</div>
-      <div className="col-span-2">Amount</div>
-      <div className="col-span-3">Remarks</div>
-      <div className="col-span-2">Action</div>
+      <div className=" col-span-1 2xl:col-span-1">Srl</div>
+      <div className=" col-span-3 2xl:col-span-2">Date</div>
+      <div className="col-span-3 2xl:col-span-2">Amount</div>
+      <div className="col-span-3 2xl:col-span-3">Remarks</div>
+      <div className="col-span-2 2xl:col-span-2">Action</div>
     </div>
   );
 };

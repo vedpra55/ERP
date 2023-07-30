@@ -198,19 +198,19 @@ const PurchaseOrderTab: FC<Props> = ({
             </>
           ) : (
             <>
-              <div className="flex gap-x-10 ">
-                <p className="2xl:w-80 ">Cost Rate:</p>
+              <div className="flex gap-x-10 text-[14px] 2xl:text-base ">
+                <p className="w-56 2xl:w-80 ">Cost Rate:</p>
                 <input
                   type="number"
                   step="any"
                   value={costRate}
                   onChange={(e) => setCostRate(e.target.value)}
-                  className="w-full border rounded-md px-5 outline-none"
+                  className=" w-full border rounded-md px-5 outline-none"
                 />
               </div>
 
-              <div className="flex gap-x-10 ">
-                <p className="2xl:w-80 ">Freight:</p>
+              <div className="flex gap-x-10 text-[14px] 2xl:text-base">
+                <p className="w-56 2xl:w-80 ">Freight:</p>
                 <input
                   type="number"
                   step="any"
@@ -220,8 +220,8 @@ const PurchaseOrderTab: FC<Props> = ({
                 />
               </div>
 
-              <div className="flex gap-x-10 ">
-                <p className="2xl:w-80 ">Non Vendor Cost:</p>
+              <div className="flex gap-x-10 text-[14px] 2xl:text-base">
+                <p className="w-56 2xl:w-80 ">Non Vendor Cost:</p>
                 <input
                   type="number"
                   step="any"
@@ -233,8 +233,8 @@ const PurchaseOrderTab: FC<Props> = ({
             </>
           )}
         </div>
-        <div className="col-span-4 px-5 py-5  border h-32 rounded-md">
-          <div className="flex items-center text-lg font-medium  gap-x-10">
+        <div className="col-span-4 px-5 py-5  border h-40 2xl:h-32 rounded-md">
+          <div className="flex items-center 2xl:text-lg font-medium  gap-x-10">
             <p>Order Date:</p>
             <p>
               {orderDate.getDate()} / {orderDate.getMonth()} /

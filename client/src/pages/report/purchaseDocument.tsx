@@ -94,7 +94,7 @@ const PurchaseDocument = ({}) => {
   ];
 
   return (
-    <div>
+    <div className="screenWidth">
       <h1 className="font-semibold text-2xl">Purchase Order Document</h1>
       <Table
         width="w-[120rem]"

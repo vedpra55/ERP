@@ -13,24 +13,28 @@ const Main = () => {
     {
       header: "Department Code",
       accessor: "department_code",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
     },
     {
       header: "Department Name",
       accessor: "department_name",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
     },
-    { header: "Closed Flag", accessor: "closed_flag", colSpan: "col-span-2" },
+    {
+      header: "Closed Flag",
+      accessor: "closed_flag",
+      colSpan: "2xl:col-span-2 md:col-span-3",
+    },
     {
       header: "Action",
       accessor: "action",
       field: "department_code",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
     },
   ];
 
   return (
-    <div className="">
+    <div className=" ">
       <Link className="myButton px-3 py-2 text-xs" to={"create"}>
         Create Category
       </Link>

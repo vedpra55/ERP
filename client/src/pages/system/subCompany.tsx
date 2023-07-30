@@ -35,17 +35,17 @@ const SubCompany: FC<Props> = ({}) => {
     {
       header: "Sub Company Name",
       accessor: "sub_company_name",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-4",
     },
     {
       header: "Sub Company Id",
       accessor: "sub_company_id",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-4",
     },
     {
       header: "Action",
       accessor: "sub_company_id",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
       handleClick: () => {
         setModalOpen(true);
       },

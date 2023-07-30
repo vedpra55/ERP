@@ -23,4 +23,12 @@ body {
   .tableRow {
     @apply grid grid-cols-12 gap-x-1 mt-3  px-10 py-2;
   }
+
+  .screenWidth {
+    @apply w-[40rem] mymd:w-[44rem] mylg5:w-[48rem] mylg4:w-[50rem] mylg3:w-[54rem] mylg2:w-[58rem] mylg:w-[62rem] myXl:w-[65rem] 2xl:w-[70rem];
+  }
+
+  .scrrenColor {
+    @apply bg-indigo-700 mymd:bg-lime-800 mylg5:bg-black mylg4:bg-yellow-500 mylg3:bg-orange-600  mylg2:bg-teal-800 mylg:bg-green-500 myXl:bg-blue-500 2xl:bg-red-500;
+  }
 }

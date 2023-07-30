@@ -22,9 +22,7 @@ const MainApp = () => {
         )}
       </div>
       <div className="bg-white flex-1 rounded-xl    p-10  h-auto ">
-        <div className="md:w-[37rem] lg:w-[50rem] xl:w-[55rem] 2xl:w-[70rem] flex-shrink-0 ">
-          <Outlet />
-        </div>
+        <Outlet />
       </div>
     </div>
   );

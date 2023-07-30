@@ -58,13 +58,25 @@ const AssignPrograms = ({}) => {
   if (!data || !roles) return;
 
   const productColumns: TableColumn[] = [
-    { header: "Role Name", accessor: "role_name", colSpan: "col-span-2" },
-    { header: "Program Name", accessor: "program_name", colSpan: "col-span-2" },
-    { header: "Access", accessor: "access", colSpan: "col-span-2" },
+    {
+      header: "Role Name",
+      accessor: "role_name",
+      colSpan: "2xl:col-span-2 md:col-span-3",
+    },
+    {
+      header: "Program Name",
+      accessor: "program_name",
+      colSpan: "2xl:col-span-3 md:col-span-3",
+    },
+    {
+      header: "Access",
+      accessor: "access",
+      colSpan: "2xl:col-span-2 md:col-span-3",
+    },
     {
       header: "Action",
       accessor: "role_name",
-      colSpan: "col-span-2",
+      colSpan: "2xl:col-span-2 md:col-span-3",
       handleClick: handleOpenModal,
     },
   ];
