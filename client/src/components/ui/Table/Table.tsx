@@ -13,6 +13,7 @@ export interface TableColumn {
   field3?: string;
   handleClick?(index?: number): void;
   isDownloadIcon?: boolean;
+  isEdit?: boolean;
 }
 
 export interface TableProps {
@@ -22,6 +23,7 @@ export interface TableProps {
   from?: string;
   height?: string;
   noMargin?: boolean;
+  onChangeInput?(val: any): void;
 }
 
 const Table: FC<TableProps> = ({

@@ -14,7 +14,7 @@ export type purchaseOrderFormValues = {
   costRate: number;
   supplierInvo: string;
   remarks: string;
-  freight: number;
+  freight?: number;
   nonVendorCost: number;
 };
 
@@ -51,11 +51,8 @@ const PurchaseOrderForm: FC<Props> = ({
   errors,
 }) => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier>();
-  const [selectedLocation, setSelectedLocation] = useState<Location>();
 
   const supplierCode = watch("supplierCode");
-  const locationCode = watch("locationCode");
-
   useEffect(() => {}, []);
 
   useEffect(() => {
@@ -66,21 +63,14 @@ const PurchaseOrderForm: FC<Props> = ({
 
       setSelectedSupplier(item);
     }
-    if (locationCode) {
-      const item = locations.filter(
-        (res) => res.location_code === locationCode
-      )[0];
-
-      setSelectedLocation(item);
-    }
-  }, [supplierCode, locationCode]);
+  }, [supplierCode]);
 
   return (
     <form
       onSubmit={handleSubmit((data: purchaseOrderFormValues) =>
         handleSubmitForm(data)
       )}
-      className="grid grid-cols-12 gap-5 items-end mt-5"
+      className="grid grid-cols-12 gap-5 items-end mt-5 rounded-md p-5 border"
     >
       <AppInput
         name="orderNo"
@@ -121,10 +111,7 @@ const PurchaseOrderForm: FC<Props> = ({
         register={register}
         closeCheck
       />
-      <SelectedValue
-        value={selectedLocation?.location_name}
-        title="Location Name"
-      />
+
       <AppInput
         name="remarks"
         placeholder="Remarks"
@@ -148,8 +135,8 @@ const PurchaseOrderForm: FC<Props> = ({
       />
 
       <AppInput
-        type="number"
         name="costRate"
+        type="number"
         placeholder="Cost Rate"
         register={register}
         errorMsg={errors.costRate?.message}
@@ -166,7 +153,7 @@ const PurchaseOrderForm: FC<Props> = ({
       <AppInput
         type="number"
         name="nonVendorCost"
-        placeholder="Non Vendor Rate"
+        placeholder="Non Vendor Cost %"
         register={register}
         errorMsg={errors.nonVendorCost?.message}
       />

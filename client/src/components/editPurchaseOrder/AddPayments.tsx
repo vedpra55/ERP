@@ -27,7 +27,9 @@ const AddPayments: FC<Props> = ({
   useEffect(() => {
     let val = 0;
     for (let i = 0; i < paymentDetails.length; i++) {
-      val += parseFloat(paymentDetails[i].amount.toString());
+      if (paymentDetails[i].amount) {
+        val += parseFloat(paymentDetails[i].amount.toString());
+      }
     }
     setSubAmount(val);
   }, [paymentDetails]);
@@ -84,11 +86,12 @@ const AddPayments: FC<Props> = ({
   };
 
   return (
-    <div>
+    <div className="border rounded-md p-5">
       <p className="mb-3 font-medium">New Payments</p>
       <Header />
       {paymentDetails.map((_, index) => (
         <AddPaymentRow
+          values={paymentDetails}
           srl={paymentDetails[index]?.srl}
           handleInputChange={handleInputChange}
           removeRow={handleRemoveRow}

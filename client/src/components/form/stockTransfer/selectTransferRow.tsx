@@ -79,7 +79,7 @@ const SelectTransferRow: FC<Props> = ({
       <select
         name="departmentCode"
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2  outline-none border  rounded-md px-2 py-1 w-28"
+        className="col-span-2  outline-none border text-[14px]  rounded-md px-2 py-1 w-28"
       >
         <option>Select</option>
         {categories.map(
@@ -94,7 +94,7 @@ const SelectTransferRow: FC<Props> = ({
       <select
         name="productCode"
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2  outline-none border  rounded-md px-2 py-1 w-36"
+        className="col-span-2  outline-none border text-[14px]   rounded-md px-2 py-1 md:w-28 2xl:w-36"
       >
         <option>Select</option>
         {filterProducts?.map(

@@ -1,10 +1,11 @@
 import { PurchaseOrder, PurchaseOrderDetails } from "@@types/system";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import ItemColumn from "./ItemColumn";
 import useApiServices from "@api/query";
 import DetailsColumn from "./detailsColumn";
 import useCreateMution from "@api/mutation";
 import AppButton from "@components/ui/AppButton";
+import { toast } from "react-hot-toast";
 
 interface Props {
   purchaseOrder: PurchaseOrder;
@@ -19,11 +20,43 @@ const PurchaseOrderTab: FC<Props> = ({
   const { data: supplier } = useFetchSingleSupplier(
     purchaseOrder.supplier_code
   );
-  const { fullFillPurchaseOrderMutation } = useCreateMution();
+  const { fullFillPurchaseOrderMutation, editPurchaseOrderMutation } =
+    useCreateMution();
 
   const { data: location } = useFetchSingleLocation(
     purchaseOrder.location_code
   );
+
+  const [costRate, setCostRate] = useState(
+    purchaseOrder.cost_rate != "0" ? purchaseOrder.cost_rate.toString() : 0
+  );
+
+  const [nonVendorCost, setNonVendorCost] = useState(
+    purchaseOrder.non_vendor_cost != 0
+      ? purchaseOrder.non_vendor_cost.toString()
+      : 0
+  );
+
+  const [freight, setFreight] = useState(
+    purchaseOrder.freight != 0 ? purchaseOrder.freight.toString() : 0
+  );
+
+  useEffect(() => {
+    setCostRate(
+      purchaseOrder.cost_rate != "0" ? purchaseOrder.cost_rate.toString() : 0
+    );
+    setNonVendorCost(
+      purchaseOrder.non_vendor_cost != 0
+        ? purchaseOrder.non_vendor_cost.toString()
+        : 0
+    );
+    setFreight(
+      purchaseOrder.freight != 0 ? purchaseOrder.freight.toString() : 0
+    );
+  }, [purchaseOrder]);
+
+  const [unitPrices, setUnitPrices] = useState<any[]>();
+  const [quantites, setQuantites] = useState<any[]>();
 
   if (!supplier) return;
 
@@ -53,9 +86,80 @@ const PurchaseOrderTab: FC<Props> = ({
     await fullFillPurchaseOrderMutation.mutateAsync(item);
   };
 
+  const onSubmit = async () => {
+    let products = [];
+
+    if (!unitPrices || !quantites) return;
+
+    for (let i = 0; i < unitPrices?.length; i++) {
+      const unitPrice = unitPrices[i];
+      const qty = quantites[i];
+
+      if (!unitPrice || !qty) {
+        toast.error("Please fill all fields");
+        return;
+      }
+
+      const p = purchaseOrderDetails[i];
+
+      let item = {
+        ...p,
+        cost_fc: parseFloat(unitPrice),
+        qty_ordered: parseInt(qty),
+      };
+
+      products.push(item);
+    }
+
+    const newProducts = mergeArraysForDifferentOrderNo(
+      purchaseOrderDetails,
+      products
+    );
+
+    let total = 0;
+    for (let i = 0; i < newProducts.length; i++) {
+      total +=
+        parseFloat(newProducts[i].qty_ordered) *
+        parseFloat(newProducts[i].cost_fc);
+    }
+
+    const item = {
+      products,
+      costRate,
+      nonVendorCost,
+      freight,
+      orderAmount: total + (freight ? parseFloat(freight.toString()) : 0),
+      order_no: purchaseOrder.order_no,
+    };
+
+    await editPurchaseOrderMutation.mutateAsync(item);
+  };
+
+  function mergeArraysForDifferentOrderNo(arr1: any[], arr2: any[]) {
+    const lookup: any = {};
+    arr1.forEach((item) => {
+      lookup[item.product_code] = item;
+    });
+
+    // Step 2: Iterate through the second array and merge the data into the first array if the order_no matches
+    arr2.forEach((item) => {
+      const productCode = item.product_code;
+      if (lookup[productCode]) {
+        // Merge the data from the second array (arr2) into the corresponding item in the first array (arr1)
+        Object.assign(lookup[productCode], item);
+      } else {
+        // If the order_no is not present in arr1, add it as a new item
+        arr1.push(item);
+      }
+    });
+
+    // Step 3: Return the merged array
+    return arr1;
+  }
+
   return (
     <div>
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 gap-x-3">
         <div className="col-span-4 flex flex-col gap-y-2">
           <ItemColumn value={purchaseOrder.order_no} title="Order No" />
           <ItemColumn
@@ -82,12 +186,52 @@ const PurchaseOrderTab: FC<Props> = ({
             title="Supplier Invoice"
           />
           <ItemColumn value={purchaseOrder.currency} title="Currency" />
-          <ItemColumn value={purchaseOrder.cost_rate} title="Cost Rate" />
-          <ItemColumn value={purchaseOrder.freight} title="Freight" />
-          <ItemColumn
-            value={`${purchaseOrder.non_vendor_cost}%`}
-            title="Non Vendor Cost"
-          />
+
+          {purchaseOrder.fulfilled_flag ? (
+            <>
+              <ItemColumn title="Cost Rate" value={purchaseOrder.cost_rate} />
+              <ItemColumn title="Freight" value={purchaseOrder.freight} />
+              <ItemColumn
+                title="Non Vendor Cost "
+                value={`${purchaseOrder.non_vendor_cost}%`}
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex gap-x-10 ">
+                <p className="2xl:w-80 ">Cost Rate:</p>
+                <input
+                  type="number"
+                  step="any"
+                  value={costRate}
+                  onChange={(e) => setCostRate(e.target.value)}
+                  className="w-full border rounded-md px-5 outline-none"
+                />
+              </div>
+
+              <div className="flex gap-x-10 ">
+                <p className="2xl:w-80 ">Freight:</p>
+                <input
+                  type="number"
+                  step="any"
+                  value={freight}
+                  onChange={(e) => setFreight(e.target.value)}
+                  className="w-full border rounded-md px-5 outline-none"
+                />
+              </div>
+
+              <div className="flex gap-x-10 ">
+                <p className="2xl:w-80 ">Non Vendor Cost:</p>
+                <input
+                  type="number"
+                  step="any"
+                  value={nonVendorCost}
+                  onChange={(e) => setNonVendorCost(e.target.value)}
+                  className="w-full border rounded-md px-5 outline-none"
+                />
+              </div>
+            </>
+          )}
         </div>
         <div className="col-span-4 px-5 py-5  border h-32 rounded-md">
           <div className="flex items-center text-lg font-medium  gap-x-10">
@@ -109,10 +253,26 @@ const PurchaseOrderTab: FC<Props> = ({
                 title="Full Fill"
               />
             )}
+            {!purchaseOrder.fulfilled_flag && (
+              <AppButton
+                handleOnClick={onSubmit}
+                isLoading={editPurchaseOrderMutation.isLoading}
+                title="Edit"
+              />
+            )}
           </div>
         </div>
       </div>
-      <DetailsColumn purchaseOrderDetails={purchaseOrderDetails} />
+      <DetailsColumn
+        freight={parseFloat(freight.toString())}
+        setUnitPrices={setUnitPrices}
+        setQuantites={setQuantites}
+        quantites={quantites}
+        unitPrices={unitPrices}
+        locationCode={purchaseOrder.location_code}
+        fullFillFlag={purchaseOrder.fulfilled_flag}
+        purchaseOrderDetails={purchaseOrderDetails}
+      />
     </div>
   );
 };

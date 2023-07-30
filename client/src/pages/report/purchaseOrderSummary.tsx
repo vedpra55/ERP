@@ -1,9 +1,8 @@
-import { Supplier } from "@@types/system";
 import useApiServices from "@api/query";
 import { DateInputNoraml } from "@components/input/DateInput";
 import { SelecteInputNormal } from "@components/input/SelectInput";
 import { useAuthContext } from "@context/AuthContext";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
 
 interface Props {}
@@ -25,8 +24,6 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
     poToDate: new Date(),
     status: "All",
   });
-
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier>();
 
   const handleDownloadDocument = async () => {
     const API = `${import.meta.env.VITE_API_URI}/report/purchaseOrderSummary`;
@@ -94,17 +91,6 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
     }
   }
 
-  useEffect(() => {
-    if (parameters.supplierCode && suppliers) {
-      const item = suppliers.filter(
-        (res) => res.supplier_code === parameters.supplierCode
-      )[0];
-      if (item) {
-        setSelectedSupplier(item);
-      }
-    }
-  }, [parameters]);
-
   if (!suppliers) return;
 
   return (
@@ -119,9 +105,7 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
           name="supplier"
           label="Supplier Code"
         />
-        <div className="col-span-4 border rounded-md px-5 py-2">
-          <p>{selectedSupplier?.supplier_name}</p>
-        </div>
+
         <DateInputNoraml
           handleChange={handleOnInputChange}
           name="poDate"

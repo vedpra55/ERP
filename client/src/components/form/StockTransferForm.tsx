@@ -66,7 +66,7 @@ const StockTransferForm: FC<Props> = ({
   return (
     <form
       onSubmit={handleSubmit((data) => handleSubmitForm(data))}
-      className="grid grid-cols-12 gap-5 items-end mt-5"
+      className="grid grid-cols-12 gap-5 items-end mt-5 border  rounded-md p-5"
     >
       <SelectInput
         closeCheck

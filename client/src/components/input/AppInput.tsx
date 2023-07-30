@@ -21,7 +21,12 @@ const AppInput: FC<Props> = ({
         <p className=" text-[14px] text-red-400 tracking-normal">{errorMsg}</p>
       )}
       <label className="text-[14px] tracking-wider ">{placeholder}</label>
-      <input type={type || "text"} className="myInput" {...register(name)} />
+      <input
+        step={"any"}
+        type={type || "text"}
+        className="myInput"
+        {...register(name)}
+      />
     </div>
   );
 };

@@ -16,7 +16,7 @@ interface Props {
 export interface PaymentDetailsValue {
   srl: string;
   date: Date;
-  amount: number;
+  amount?: number | string;
   remarks: string;
 }
 
@@ -36,7 +36,7 @@ const PurchasePayment: FC<Props> = ({
     {
       srl: "",
       date: new Date(),
-      amount: 0,
+      amount: "",
       remarks: "",
     },
   ]);
@@ -45,7 +45,7 @@ const PurchasePayment: FC<Props> = ({
 
   const handlePayment = async () => {
     const totalLefAmount = total - purchaseOrder.amount_paid;
-    console.log(subAmount, totalLefAmount);
+
     if (subAmount > totalLefAmount) {
       toast.error("You are over paying please check the amount");
       return;
@@ -54,7 +54,7 @@ const PurchasePayment: FC<Props> = ({
     for (let i = 0; i > paymentRowData.length; i++) {
       const item = paymentRowData[i];
       if (
-        item.amount == 0 ||
+        item.amount == "" ||
         item.remarks == "" ||
         item.srl == "" ||
         !item.date
@@ -70,13 +70,14 @@ const PurchasePayment: FC<Props> = ({
       subTotal: subTotal,
       totalOrderValue: total,
     };
+
     await addPurchaseOrderPaymentMutation.mutateAsync(item);
 
     setPaymentRowData([
       {
         srl: "",
         date: new Date(),
-        amount: 0,
+        amount: "",
         remarks: "",
       },
     ]);
@@ -92,12 +93,16 @@ const PurchasePayment: FC<Props> = ({
             title="Non Vendor Cost"
           />
           <ItemColumn
-            value={`${nonVendorCostValue}`}
+            value={`${nonVendorCostValue.toFixed(3)}`}
             title="Non Vendor Cost Value"
           />
           <ItemColumn value={`${total}`} title="Total Order Value" />
           <ItemColumn value={purchaseOrder.freight} title="Freight" />
           <ItemColumn value={purchaseOrder.amount_paid} title="Amount Paid" />
+          <ItemColumn
+            value={total - purchaseOrder.amount_paid}
+            title="Due Amount"
+          />
         </div>
         <div className="col-span-4 p-5 border rounded-md h-40">
           <div className="flex font-medium text-lg items-center gap-x-10">

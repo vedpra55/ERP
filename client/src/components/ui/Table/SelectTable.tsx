@@ -44,12 +44,7 @@ const SelectTable: FC<Props> = ({
       {data.map((item, index) => {
         const isSelected = isSelectedItem(item, columns[0].accessor);
 
-        if (isSelected && from === "main")
-          return (
-            <div className="tableRow">
-              <p className="col-span-12 text-[14px]"> This item is selected</p>
-            </div>
-          );
+        if (isSelected && from === "main") return null;
         return (
           <div
             onClick={() => select(item)}

@@ -71,7 +71,7 @@ const SelectTransferDetails: FC<Props> = ({
   };
 
   return (
-    <div className="col-span-12 mt-5">
+    <div className="col-span-12 mt-5 rounded-md border p-5">
       <Header />
       {transferDetailsRow.map((_, index) => (
         <SelectTransferRow

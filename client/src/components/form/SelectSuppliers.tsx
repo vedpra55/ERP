@@ -83,7 +83,7 @@ const SelectSuppliers: React.FC<Props> = ({
   return (
     <div className="mt-10">
       {selectedSuppliers.length > 0 && (
-        <div>
+        <div className="border rounded-md p-5">
           <p className="font-medium">Selected Suppliers</p>
           <SelectTable
             handleRemove={removeSelectedSupplier}
@@ -95,15 +95,17 @@ const SelectSuppliers: React.FC<Props> = ({
           />
         </div>
       )}
-      <p className="font-medium">All Suppliers</p>
-      <SelectTable
-        isSelectedItem={isSelectedItem}
-        selectedItems={selectedSuppliers}
-        handleSelect={handleSelect}
-        columns={supplierColumn}
-        data={suppliers}
-        from="main"
-      />
+      <div className="border rounded-md p-5 mt-5">
+        <p className="font-medium">All Suppliers</p>
+        <SelectTable
+          isSelectedItem={isSelectedItem}
+          selectedItems={selectedSuppliers}
+          handleSelect={handleSelect}
+          columns={supplierColumn}
+          data={suppliers}
+          from="main"
+        />
+      </div>
     </div>
   );
 };

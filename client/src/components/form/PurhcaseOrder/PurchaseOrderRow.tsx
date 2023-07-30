@@ -50,7 +50,7 @@ const PurchaseOrderRow: FC<Props> = ({
       <select
         name="productCode"
         onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2  outline-none border  rounded-md px-2 py-1 w-36"
+        className="col-span-2  outline-none border  rounded-md px-2 py-1 w-28 text-[14px]"
       >
         <option>Select</option>
         {filterProducts?.map(

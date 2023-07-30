@@ -40,7 +40,6 @@ export const createPurchaseOrder = async (req, res, next) => {
       !supplierInvo ||
       !dueDate ||
       !costRate ||
-      !freight ||
       !total ||
       !nonVendorCost
     ) {
@@ -64,7 +63,7 @@ export const createPurchaseOrder = async (req, res, next) => {
 
       await Prisma.inv_purchase_order.create({
         data: {
-          company_id: parseInt(user.company_id),
+          company_id: user.company_id,
           sub_company_id: user.sub_company_id,
           order_no: orderNo,
           location_code: locationCode,
@@ -75,7 +74,7 @@ export const createPurchaseOrder = async (req, res, next) => {
           remarks: remarks,
           eta: new Date(dueDate),
           order_amount: parseFloat(total),
-          freight: parseFloat(freight),
+          freight: freight ? parseFloat(freight) : 0,
           non_vendor_cost: parseFloat(nonVendorCost),
           cost_rate: parseFloat(costRate),
           amount_paid: parseFloat(paidAmount),
@@ -562,5 +561,171 @@ export const getSinglePurchaseOrder = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const editPurchaseOrder = async (req, res, next) => {
+  try {
+    const {
+      products,
+      remarks,
+      costRate,
+      nonVendorCost,
+      freight,
+      user,
+      order_no,
+      orderAmount,
+    } = req.body;
+
+    await Prisma.$transaction(async (Prisma) => {
+      await Prisma.inv_purchase_order.update({
+        where: {
+          company_id_sub_company_id_order_no: {
+            order_no: order_no,
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+          },
+        },
+        data: {
+          freight: parseFloat(freight),
+          remarks: remarks,
+          cost_rate: parseFloat(costRate),
+          non_vendor_cost: parseFloat(nonVendorCost),
+          order_amount: parseFloat(orderAmount),
+        },
+      });
+
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+
+        await Prisma.inv_purchase_order_detail.update({
+          where: {
+            company_id_sub_company_id_order_no_serial_no: {
+              order_no: order_no,
+              company_id: user.company_id,
+              sub_company_id: user.sub_company_id,
+              serial_no: parseInt(product.serial_no),
+            },
+          },
+          data: {
+            cost_fc: parseFloat(product.cost_fc),
+            qty_ordered: parseInt(product.qty_ordered),
+          },
+        });
+
+        await Prisma.inv_products.update({
+          where: {
+            company_id_sub_company_id_department_code_product_code: {
+              company_id: user.company_id,
+              sub_company_id: user.sub_company_id,
+              department_code: product.department_code,
+              product_code: product.product_code,
+            },
+          },
+          data: {
+            qty_backorder: parseInt(product.qty_ordered),
+          },
+        });
+      }
+
+      res.status(200).json({
+        message: "Purchase order updated successfully",
+      });
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deletePurchaseOrderProduct = async (req, res, next) => {
+  try {
+    const { srl, orderNo, amount, user, product, locationCode } = req.body;
+
+    await Prisma.$transaction(async (Prisma) => {
+      await Prisma.inv_purchase_order.update({
+        where: {
+          company_id_sub_company_id_order_no: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            order_no: orderNo,
+          },
+        },
+        data: {
+          order_amount: amount,
+        },
+      });
+
+      await Prisma.inv_purchase_order_detail.delete({
+        where: {
+          company_id_sub_company_id_order_no_serial_no: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            order_no: orderNo,
+            serial_no: parseInt(srl),
+          },
+        },
+      });
+
+      const pr = await Prisma.inv_products.findUnique({
+        where: {
+          company_id_sub_company_id_department_code_product_code: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            department_code: product.department_code,
+            product_code: product.product_code,
+          },
+        },
+      });
+
+      await Prisma.inv_products.update({
+        where: {
+          company_id_sub_company_id_department_code_product_code: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            department_code: product.department_code,
+            product_code: product.product_code,
+          },
+        },
+        data: {
+          qty_backorder: pr.qty_backorder - parseInt(product.qty_ordered),
+        },
+      });
+
+      const store = await Prisma.inv_stores.findUnique({
+        where: {
+          company_id_sub_company_id_location_code_department_code_product_code:
+            {
+              company_id: user.company_id,
+              sub_company_id: user.sub_company_id,
+              department_code: product.department_code,
+              product_code: product.product_code,
+              location_code: locationCode,
+            },
+        },
+      });
+
+      await Prisma.inv_stores.update({
+        where: {
+          company_id_sub_company_id_location_code_department_code_product_code:
+            {
+              company_id: user.company_id,
+              sub_company_id: user.sub_company_id,
+              department_code: product.department_code,
+              product_code: product.product_code,
+              location_code: locationCode,
+            },
+        },
+        data: {
+          qty_backorder: store.qty_backorder - parseInt(product.qty_ordered),
+        },
+      });
+
+      res.status(200).json({
+        message: "Purchase order product deleted",
+      });
+    });
+  } catch (err) {
+    next(err);
+    console.log(err);
   }
 };

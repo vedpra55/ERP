@@ -46,7 +46,7 @@ const SelectOrderDetails: FC<Props> = ({
     }
 
     if (name === "unitPrice") {
-      list[index]["unitPrice"] = parseInt(value);
+      list[index]["unitPrice"] = parseFloat(value);
       setOrderDetailsRow(list);
 
       const list2 = [...orderDetailsRow];
@@ -89,7 +89,7 @@ const SelectOrderDetails: FC<Props> = ({
   };
 
   return (
-    <div className="col-span-12 mt-5">
+    <div className="col-span-12 mt-5 border rounded-md p-5">
       <Header />
       {orderDetailsRow.map((_, index) => (
         <PurchaseOrderRow

@@ -6,13 +6,22 @@ interface Props {
   handleOnClick(): void;
   isLoading?: boolean;
   width?: string;
+  color?: string;
 }
 
-const AppButton: FC<Props> = ({ title, handleOnClick, isLoading, width }) => {
+const AppButton: FC<Props> = ({
+  title,
+  handleOnClick,
+  isLoading,
+  width,
+  color,
+}) => {
   return (
     <button
       onClick={handleOnClick}
-      className={`myButton ${width ? width : "w-28"} h-10 py-0`}
+      className={`myButton ${color ? color : ""} ${
+        width ? width : "w-28"
+      } h-10 py-0`}
     >
       {isLoading ? <PulseLoader size={14} color="white" /> : <p>{title}</p>}
     </button>

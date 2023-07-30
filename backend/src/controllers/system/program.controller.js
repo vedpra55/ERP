@@ -89,7 +89,7 @@ export const getCompanyRoleProgram = async (req, res, next) => {
       return next(createHttpError.BadRequest("No subcompany id found"));
     }
 
-    const rolePrograms = await Prisma.sys_roleprograms.findMany({
+    let originalData = await Prisma.sys_roleprograms.findMany({
       where: {
         company_id: user.company_id,
         sub_company_id: parseInt(subCompanyId),
@@ -99,33 +99,21 @@ export const getCompanyRoleProgram = async (req, res, next) => {
           },
         },
       },
+      include: { sys_programs: true },
     });
 
-    let programNames = [];
-
-    for (let i = 0; i < rolePrograms.length; i++) {
-      const role = rolePrograms[i];
-
-      const item = await Prisma.sys_programs.findUnique({
-        where: {
-          company_id_sub_company_id_program_id: {
-            company_id: role.company_id,
-            sub_company_id: role.sub_company_id,
-            program_id: role.program_id,
-          },
-        },
-        select: {
-          program_name: true,
-        },
-      });
-
-      programNames.push(item);
-    }
+    const rolePrograms = originalData.map((item) => ({
+      company_id: item.company_id,
+      sub_company_id: item.sub_company_id,
+      role_name: item.role_name,
+      program_id: item.program_id,
+      access: item.access,
+      program_name: item.sys_programs.program_name,
+    }));
 
     res.status(200).json({
       res: {
         rolePrograms,
-        programNames,
       },
     });
   } catch (err) {

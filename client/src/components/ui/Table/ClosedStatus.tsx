@@ -11,7 +11,7 @@ const ClosedStatus: FC<Props> = ({ access }) => {
         access != true
           ? "bg-green-500 text-white text-[14px]"
           : "bg-red-600 text-white text-[14px]"
-      } rounded-lg p-1 w-20 text-center `}
+      } rounded-lg p-1 w-20 text-center text-[14px] `}
     >{`${access == true ? "Closed" : "Active"}`}</div>
   );
 };

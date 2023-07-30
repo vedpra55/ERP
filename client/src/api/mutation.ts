@@ -23,12 +23,15 @@ import {
   updateSubCompanyName,
   updateSupplier,
   updateUserRoleProgram,
+  editUser,
+  editPurchaseOrder,
 } from "./putCall";
 import { departmentForm } from "@components/form/CategoryForm";
 
 import { supplierFormValue } from "@components/form/SupplierForm";
 import { locationFormValues } from "@components/form/LocationForm";
 import { productFormValues } from "@components/form/ProductForm";
+import { deletePurchaseOrderProduct, deleteUser } from "./deleteCalls";
 
 const useCreateMution = () => {
   const { user } = useAuthContext();
@@ -286,6 +289,58 @@ const useCreateMution = () => {
     }
   );
 
+  const deleteUserMutation = useMutation(
+    (value: any) => deleteUser(value, user.access_token),
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: (data: string) => {
+        queryClient.invalidateQueries({ queryKey: ["created-users"] });
+        toast.success(data);
+      },
+    }
+  );
+
+  const editUserMutation = useMutation(
+    (value: any) => editUser(value, user.access_token),
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: (data: string) => {
+        queryClient.invalidateQueries({ queryKey: ["created-users"] });
+        toast.success(data);
+      },
+    }
+  );
+
+  const editPurchaseOrderMutation = useMutation(
+    (value: any) => editPurchaseOrder(value, user.access_token),
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: (data: string) => {
+        queryClient.invalidateQueries({ queryKey: ["purchase-order"] });
+        toast.success(data);
+      },
+    }
+  );
+
+  const deletePurchaseOrderProductMutation = useMutation(
+    (value: any) => deletePurchaseOrderProduct(value, user.access_token),
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: (data: string) => {
+        queryClient.invalidateQueries({ queryKey: ["purchase-order"] });
+        toast.success(data);
+      },
+    }
+  );
+
   return {
     createRoleMutation,
     createUserMutation,
@@ -305,6 +360,10 @@ const useCreateMution = () => {
     updateSupplierMutation,
     createStockTransferMutation,
     acknowledgeStockTransferMutation,
+    deleteUserMutation,
+    editUserMutation,
+    editPurchaseOrderMutation,
+    deletePurchaseOrderProductMutation,
   };
 };
 

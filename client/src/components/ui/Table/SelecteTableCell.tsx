@@ -36,6 +36,7 @@ const Cell: React.FC<Props> = ({
 
   return (
     <p
+      className="text-[13px]"
       onClick={() => {
         if (column.id && handleSelect) {
           handleSelect(item[column.accessor]);

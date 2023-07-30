@@ -307,7 +307,7 @@ export const createUserByAdmin = async (req, res, next) => {
       });
 
       if (userExist) {
-        next(createHttpError.BadRequest("Email or name exit"));
+        next(createHttpError.BadRequest("Email and Name must be unique"));
       }
 
       const hashedPassword = hashPassword(password);
@@ -478,6 +478,51 @@ export const verifyEmail = async (req, res, next) => {
     res.json({ message: "Email verified successfully." });
   } catch (err) {
     console.log(err);
+    next(err);
+  }
+};
+
+export const EditUserRole = async (req, res, next) => {
+  const { user, subCompanyId, username, updatedRole } = req.body;
+
+  try {
+    await Prisma.sys_users.update({
+      where: {
+        company_id_sub_company_id_username: {
+          company_id: user.company_id,
+          sub_company_id: parseInt(subCompanyId),
+          username: username,
+        },
+      },
+      data: {
+        role_name: updatedRole,
+      },
+    });
+
+    res.status(200).json({
+      message: "User updated successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { user, subCompanyId, username } = req.body;
+    await Prisma.sys_users.delete({
+      where: {
+        company_id_sub_company_id_username: {
+          company_id: user.company_id,
+          sub_company_id: parseInt(subCompanyId),
+          username: username,
+        },
+      },
+    });
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (err) {
     next(err);
   }
 };

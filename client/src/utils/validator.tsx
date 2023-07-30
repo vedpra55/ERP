@@ -118,7 +118,6 @@ export const purchaseOrderSchema = yup.object().shape({
   costRate: yup.number().required("Cost Rate is required"),
   supplierInvo: yup.string().required("Supplier Invoice is required"),
   remarks: yup.string().required("Remarks is required"),
-  freight: yup.number().required("Freight is required"),
   nonVendorCost: yup.number().required("Non Vendor Cost is required"),
   dueDate: yup.date().required("Due date is required"),
 });

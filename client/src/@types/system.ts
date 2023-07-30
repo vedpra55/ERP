@@ -18,19 +18,20 @@ export type Role = {
   role_name: string;
 };
 
-export type RolePrograms = Program & {
+export type RolePrograms = {
   access: boolean;
   program_id: number;
   role_name: string;
+  program_name: string;
 };
 
 export type CreatedUser = {
   email: string;
   password: string;
   username: string;
-  companyId: number;
-  roleName: string;
-  subCompanyId: number;
+  company_id: number;
+  role_name: string;
+  sub_company_id: number;
   token: string;
 };
 

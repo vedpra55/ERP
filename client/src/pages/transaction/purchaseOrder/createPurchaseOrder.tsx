@@ -9,6 +9,7 @@ import SelectOrderDetails from "@components/form/PurhcaseOrder/SelectOrderDetail
 import AppButton from "@components/ui/AppButton";
 import BackButton from "@components/ui/BackButton";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { isDublicateItems } from "@utils/helper";
 import { purchaseOrderSchema } from "@utils/validator";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -64,13 +65,18 @@ const CreatePurchaseOrder = () => {
       }
     }
 
+    if (isDublicateItems(ordersData)) {
+      toast.error("There is record with same product code please check");
+      return;
+    }
+
     const items = {
       ...data,
       products: ordersData,
       paidAmount: 0,
       orderDate: new Date().toISOString(),
       dueDate: new Date(data.dueDate).toISOString(),
-      total: parseInt(freight.toString()) + subTotal,
+      total: freight ? parseInt(freight.toString()) + subTotal : subTotal,
     };
 
     await createPurchaseOrderMutation.mutateAsync(items);
@@ -82,7 +88,6 @@ const CreatePurchaseOrder = () => {
       val = val + ordersData[i].value;
     }
     setSubTotal(val);
-    console.log(val);
   }, [ordersData]);
 
   if (!suppliers || !locations) return;
@@ -116,7 +121,9 @@ const CreatePurchaseOrder = () => {
         locations={locations}
       />
       <SelectOrderDetails
-        totalOrderValue={subTotal + parseInt(freight?.toString())}
+        totalOrderValue={
+          subTotal + (freight ? parseFloat(freight.toString()) : 0)
+        }
         orderDetailsRow={ordersData}
         setOrderDetailsRow={setOrderData}
       />

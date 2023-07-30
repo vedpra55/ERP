@@ -1,3 +1,4 @@
+import { FC } from "react";
 import AccessStatus from "./AccessStatus";
 import ActonColumn from "./ActionColumn";
 
@@ -67,11 +68,32 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
     );
   }
 
+  if (column.accessor === "user_name" && column.handleClick) {
+    return (
+      <ActonColumn
+        index={index}
+        field={item[column?.field || "user_name"]}
+        col={`${column.colSpan}`}
+        handleClickWithVal={column.handleClick}
+      />
+    );
+  }
+
   if (column.accessor === "document" && column.handleClick) {
-    console.log("okk");
     return (
       <ActonColumn
         isDownloadIcon={true}
+        index={index}
+        col={`${column.colSpan}`}
+        handleClickWithVal={column.handleClick}
+      />
+    );
+  }
+
+  if (column.accessor === "serial_no" && column.handleClick) {
+    return (
+      <ActonColumn
+        isDeleteIcon
         index={index}
         col={`${column.colSpan}`}
         handleClickWithVal={column.handleClick}
@@ -101,7 +123,12 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
     );
   }
 
-  if (column.accessor === "value" && column.field2 && column.field) {
+  if (
+    column.accessor === "value" &&
+    column.field2 &&
+    column.field &&
+    column.isEdit == false
+  ) {
     return (
       <p>{parseInt(item[column.field]) * parseInt(item[column.field2])}</p>
     );
@@ -115,3 +142,7 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
 };
 
 export default TableCell;
+
+const Value: FC<{ val: number }> = ({ val }) => {
+  return <p>{val}</p>;
+};

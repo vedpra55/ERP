@@ -65,16 +65,20 @@ const EditPurchaseOrder = () => {
         <div
           onClick={() => setSelectedTab(0)}
           className={`w-64 ${
-            selectedTab === 0 ? "border-b-2 text-black" : "text-gray-700"
-          } font-medium border-black py-2 cursor-pointer text-center`}
+            selectedTab === 0
+              ? "border-2 text-black border-black"
+              : "border text-gray-700 border-gray-200"
+          } font-medium border-black py-2 cursor-pointer text-center  rounded-md`}
         >
           <p>Purchase Order</p>
         </div>
         <div
           onClick={() => setSelectedTab(1)}
           className={`w-64 ${
-            selectedTab === 1 ? "border-b-2 text-black" : "text-gray-700"
-          } font-medium  border-black py-2 cursor-pointer text-center`}
+            selectedTab === 1
+              ? "border-2 text-black border-black"
+              : "border text-gray-700 border-gray-200"
+          } font-medium border-black py-2 cursor-pointer text-center  rounded-md`}
         >
           <p>Payment</p>
         </div>

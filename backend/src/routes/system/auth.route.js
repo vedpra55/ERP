@@ -7,6 +7,8 @@ import {
   updateUserRole,
   verifyLoggedinUser,
   verifyEmail,
+  deleteUser,
+  EditUserRole,
 } from "../../controllers/system/auth.controller.js";
 import {
   verifyAdminToken,
@@ -22,5 +24,7 @@ router.put("/updateRole", verifyAdminToken, updateUserRole);
 router.get("/subCompanyUsers", verifyAdminToken, getUsersBySubCompany);
 router.post("/verifyUser", verifyToken, verifyLoggedinUser);
 router.get("/verify", verifyEmail);
+router.put("/", verifyAdminToken, EditUserRole);
+router.put("/delete", verifyAdminToken, deleteUser);
 
 export default router;

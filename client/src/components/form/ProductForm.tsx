@@ -19,11 +19,11 @@ export type productFormValues = {
   productCode: string;
   productDescription: string;
   qtyInStock?: number;
-  qtyPurchase?: number;
+  sellingPrice?: number;
   qtyBackOrder?: number;
+  qtyPurchase?: number;
   costPrice?: number;
   closedFlag?: boolean;
-  sellingPrice?: number;
 };
 
 const ProductForm: FC<Props> = ({
@@ -60,7 +60,7 @@ const ProductForm: FC<Props> = ({
   return (
     <form
       onSubmit={handleSubmit((data) => handleSubmitForm(data))}
-      className="grid grid-cols-12 gap-5 items-end mt-5"
+      className="grid grid-cols-12 gap-5 items-end mt-5 border rounded-md  p-5"
     >
       {!defaultValues && (
         <>
@@ -97,16 +97,10 @@ const ProductForm: FC<Props> = ({
             errorMsg={errors.qtyInStock?.message}
           />
           <AppInput
-            name="qtyPurchase"
-            placeholder="Qty Purchase"
+            name="costPrice"
+            placeholder="Cost Price"
             register={register}
-            errorMsg={errors.qtyPurchase?.message}
-          />
-          <AppInput
-            name="qtyBackOrder"
-            placeholder="Qty Backorder"
-            register={register}
-            errorMsg={errors.qtyBackOrder?.message}
+            errorMsg={errors.qtyInStock?.message}
           />
         </>
       )}

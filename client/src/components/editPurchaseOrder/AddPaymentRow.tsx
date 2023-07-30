@@ -6,6 +6,7 @@ interface Props {
   removeRow(index: number): void;
   index: number;
   srl?: string;
+  values: any[];
 }
 
 const AddPaymentRow: FC<Props> = ({
@@ -13,6 +14,7 @@ const AddPaymentRow: FC<Props> = ({
   removeRow,
   index,
   srl,
+  values,
 }) => {
   return (
     <div className="grid grid-cols-12 items-center mb-5 gap-x-3 px-10 py-2 border-b">
@@ -25,6 +27,7 @@ const AddPaymentRow: FC<Props> = ({
       />
       <input
         name="amount"
+        value={values[index].amount}
         onChange={(e) => handleInputChange(e, index)}
         className="col-span-2 border px-2 py-2 w-28 rounded-md outline-none"
         type="number"

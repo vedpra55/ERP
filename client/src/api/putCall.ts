@@ -191,3 +191,43 @@ export const acknowledgeStockTransfer = async (value: any, token: string) => {
     toast.error(message.message);
   }
 };
+
+export const editUser = async (values: any, token: string) => {
+  try {
+    const { data } = await client.put(
+      "system/auth",
+      {
+        ...values,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    return data.message;
+  } catch (err) {
+    const message = catchAsyncError(err);
+    toast.error(message.message);
+  }
+};
+
+export const editPurchaseOrder = async (values : any, token  : string) => {
+  try {
+    const { data } = await client.put(
+      "transaction/purchaseOrder",
+      {
+        ...values,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    return data.message;
+  } catch (err) {
+    const message = catchAsyncError(err);
+    toast.error(message.message);
+  }
+}
