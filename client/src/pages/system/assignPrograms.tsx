@@ -42,6 +42,12 @@ const AssignPrograms = ({}) => {
 
   useEffect(() => {
     if (data && selectedRole) {
+      if (selectedRole === "All") {
+        let filterp = data.rolePrograms;
+        setFilterRolePrograms(filterp);
+        return;
+      }
+
       const filterp = data.rolePrograms.filter(
         (item: any) => item.role_name === selectedRole
       );
@@ -73,6 +79,7 @@ const AssignPrograms = ({}) => {
           className="border px-2 py-1 rounded-md mb-5 outline-none"
         >
           <option>Select</option>
+          <option>All</option>
           {roles.map(
             (item) =>
               item.role_name != "admin" && (
