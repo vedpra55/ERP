@@ -97,7 +97,7 @@ const CreateAccount = () => {
         </button>
 
         <Link
-          className="text-xs mt-5 font-medium font-gray-500"
+          className="text-xs mt-5 text-blue-600 underline font-medium font-gray-500"
           to={"/account/signin"}
         >
           Already have account ?

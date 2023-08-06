@@ -1,6 +1,7 @@
 import useApiServices from "@api/query";
 import { DateInputNoraml } from "@components/input/DateInput";
-import { SelecteInputNormal } from "@components/input/SelectInput";
+import SelectSupplier from "@components/input/SelectSupplier";
+import AppButton from "@components/ui/AppButton";
 import { useAuthContext } from "@context/AuthContext";
 import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -18,6 +19,7 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
   const { useFetchSuppliers } = useApiServices();
   const { user } = useAuthContext();
   const { data: suppliers } = useFetchSuppliers();
+
   const [parameters, setParameters] = useState<PODSummaryType>({
     supplierCode: "",
     poDate: new Date(),
@@ -25,8 +27,12 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
     status: "All",
   });
 
+  const [isLoading, setLoading] = useState(false);
+
   const handleDownloadDocument = async () => {
     const API = `${import.meta.env.VITE_API_URI}/report/purchaseOrderSummary`;
+
+    setLoading(true);
 
     const data = {
       ...parameters,
@@ -63,6 +69,8 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
 
       toast.success("Pdf Download Started");
     } catch (error) {}
+
+    setLoading(false);
   };
 
   function handleOnInputChange(e: any) {
@@ -70,7 +78,7 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
 
     const list = { ...parameters };
 
-    if (name === "supplier") {
+    if (name === "supplierCode") {
       list["supplierCode"] = value;
       setParameters(list);
     }
@@ -96,15 +104,13 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
   return (
     <div>
       <h1 className="font-semibold text-2xl">Purchase Order Summary</h1>
-      <div className="grid grid-cols-12 gap-5 mt-10 items-end">
-        <SelecteInputNormal
-          handleChange={handleOnInputChange}
-          data={suppliers}
-          accessor="supplier_code"
-          extraValAccessor="supplier_name"
-          name="supplier"
-          label="Supplier Code"
-        />
+      <div className="grid grid-cols-12 mb-5 gap-5 mt-10 items-end">
+        <div className="col-span-4">
+          <SelectSupplier
+            handleInputChange={handleOnInputChange}
+            label="Supplier Code"
+          />
+        </div>
 
         <DateInputNoraml
           handleChange={handleOnInputChange}
@@ -118,9 +124,11 @@ const PurchaseOrderSummary: FC<Props> = ({}) => {
         />
         <StatusSelection handleOnInputChange={handleOnInputChange} />
       </div>
-      <button onClick={handleDownloadDocument} className="myButton mt-5 w-28">
-        Download
-      </button>
+      <AppButton
+        isLoading={isLoading}
+        title="Download"
+        handleOnClick={handleDownloadDocument}
+      />
     </div>
   );
 };
@@ -132,7 +140,7 @@ const StatusSelection: FC<{ handleOnInputChange: any }> = ({
 }) => {
   return (
     <div className="flex col-span-6 flex-col gap-y-1  w-80  ">
-      <p className="text-[15px] tracking-wider">Status</p>
+      <p className="text-[15px] tracking-wider font-medium">Status</p>
       <select
         className="border rounded-md py-2 px-5 outline-none"
         name="status"

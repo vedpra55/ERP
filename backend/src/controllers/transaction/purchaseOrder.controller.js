@@ -39,9 +39,7 @@ export const createPurchaseOrder = async (req, res, next) => {
       !locationCode ||
       !supplierInvo ||
       !dueDate ||
-      !costRate ||
-      !total ||
-      !nonVendorCost
+      !total
     ) {
       return next(createHttpError.BadRequest("Please fill all fields"));
     }
@@ -75,7 +73,7 @@ export const createPurchaseOrder = async (req, res, next) => {
           eta: new Date(dueDate),
           order_amount: parseFloat(total),
           freight: freight ? parseFloat(freight) : 0,
-          non_vendor_cost: parseFloat(nonVendorCost),
+          non_vendor_cost: nonVendorCost ? parseFloat(nonVendorCost) : 0,
           cost_rate: parseFloat(costRate),
           amount_paid: parseFloat(paidAmount),
           fulfilled_flag: false,
@@ -85,6 +83,14 @@ export const createPurchaseOrder = async (req, res, next) => {
         },
       });
       for (let i = 0; i < products.length; i++) {
+        let costLocal = 0;
+
+        if (costRate) {
+          costLocal = parseFloat(products[i].unitPrice) + parseFloat(costRate);
+        } else {
+          costLocal = parseFloat(products[i].unitPrice);
+        }
+
         await Prisma.inv_purchase_order_detail.create({
           data: {
             company_id: parseInt(user.company_id),
@@ -95,8 +101,7 @@ export const createPurchaseOrder = async (req, res, next) => {
             product_code: products[i].productCode,
             qty_ordered: parseInt(products[i].qtyBackorder),
             qty_received: 0,
-            cost_local:
-              parseFloat(products[i].unitPrice) * parseFloat(costRate),
+            cost_local: costLocal,
             cost_fc: parseFloat(products[i].unitPrice),
           },
         });
@@ -205,7 +210,6 @@ export const handleOrderFullFill = async (req, res, next) => {
       !freight ||
       !nonSupplierCost ||
       !subTotal ||
-      !subTotal ||
       !total
     ) {
       return next(createHttpError.BadRequest("Please fill all fields"));
@@ -259,8 +263,6 @@ export const handleOrderFullFill = async (req, res, next) => {
             parseFloat(total)
           );
 
-        console.log(costFcT, costLocalT);
-
         if (!costFcT || !costLocalT) {
           return next(createHttpError.BadRequest("No cost price"));
         }
@@ -280,8 +282,8 @@ export const handleOrderFullFill = async (req, res, next) => {
           costLocal = costLocalT;
         }
 
-        if (!costLocal) {
-          return next(createHttpError.BadRequest("No cost price 2"));
+        if (costLocal === null) {
+          return next(createHttpError.BadRequest("No cost price 2 again"));
         }
 
         /// Update costfc and costLocal in pod
@@ -505,15 +507,123 @@ export const getAllPurhcaseOrder = async (req, res, next) => {
   try {
     const { user } = req.body;
 
-    const purchaseOrders = await Prisma.inv_purchase_order.findMany({
+    const { searchText, fullFillStatus, paidStatus, toDate, fromDate, page } =
+      req.query;
+
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    const take = 10;
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    if (fullFillStatus) {
+      where.fulfilled_flag = fullFillStatus === "FullFill" ? true : false;
+    }
+
+    if (paidStatus) {
+      where.paid_flag = paidStatus === "Paid" ? true : false;
+    }
+
+    let locWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    let supplierWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText) {
+      locWhere.location_name = {
+        contains: searchText,
+        mode: "insensitive",
+      };
+
+      supplierWhere.supplier_name = {
+        contains: searchText,
+        mode: "insensitive",
+      };
+    }
+
+    // Add date range filtering
+    if (fromDate && toDate) {
+      where.created_on = {
+        gte: new Date(fromDate).toISOString(),
+        lte: new Date(toDate).toISOString(),
+      };
+    }
+
+    const locations = await Prisma.inv_locations.findMany({
       where: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
+        ...locWhere,
       },
     });
 
+    const supplier = await Prisma.inv_suppliers.findMany({
+      where: {
+        ...supplierWhere,
+      },
+    });
+
+    const locationCodes = locations.map((item) => item.location_code);
+
+    const supplierCodes = supplier.map((item) => item.supplier_code);
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { order_no: { contains: searchText, mode: "insensitive" } },
+            { supplier_code: { contains: searchText, mode: "insensitive" } },
+            { location_code: { in: locationCodes } },
+            { supplier_code: { in: supplierCodes } },
+          ],
+        },
+      ];
+    }
+
+    const totalCount = await Prisma.inv_purchase_order.count({
+      where: {
+        ...where,
+      },
+    });
+
+    const originalData = await Prisma.inv_purchase_order.findMany({
+      where,
+      orderBy: {
+        created_on: "desc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+      include: {
+        inv_locations: true,
+        inv_suppliers: true,
+      },
+    });
+
+    const purchaseOrders = originalData.map((item) => ({
+      order_no: item.order_no,
+      location: item.inv_locations.location_name,
+      supplier: item.inv_suppliers.supplier_name,
+      fulfilled_flag: item.fulfilled_flag,
+      paid_flag: item.paid_flag,
+      order_dt: item.order_dt,
+      order_amount: item.order_amount,
+      amount_paid: item.amount_paid,
+    }));
+
     return res.status(200).json({
-      res: purchaseOrders,
+      res: {
+        purchaseOrders,
+        totalCount,
+      },
     });
   } catch (err) {
     next(err);

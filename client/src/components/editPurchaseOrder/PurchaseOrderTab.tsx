@@ -67,8 +67,16 @@ const PurchaseOrderTab: FC<Props> = ({
 
     for (let i = 0; i < purchaseOrderDetails.length; i++) {
       subTotal +=
-        parseFloat(purchaseOrderDetails[i].cost_local.toString()) *
+        parseFloat(purchaseOrderDetails[i].cost_fc.toString()) *
         parseFloat(purchaseOrderDetails[i].qty_ordered.toString());
+    }
+
+    let total = 0;
+
+    if (purchaseOrder.freight) {
+      total = subTotal + parseFloat(purchaseOrder.freight.toString());
+    } else {
+      total = subTotal;
     }
 
     const item = {
@@ -80,7 +88,7 @@ const PurchaseOrderTab: FC<Props> = ({
       nonSupplierCost: purchaseOrder.non_vendor_cost,
       products: purchaseOrderDetails,
       subTotal: subTotal,
-      total: subTotal + parseFloat(purchaseOrder.freight.toString()),
+      total: total,
     };
 
     await fullFillPurchaseOrderMutation.mutateAsync(item);
@@ -237,7 +245,7 @@ const PurchaseOrderTab: FC<Props> = ({
           <div className="flex items-center 2xl:text-lg font-medium  gap-x-10">
             <p>Order Date:</p>
             <p>
-              {orderDate.getDate()} / {orderDate.getMonth()} /
+              {orderDate.getDate()} / {orderDate.getMonth() + 1} /
               {orderDate.getFullYear()}
             </p>
           </div>
@@ -264,7 +272,6 @@ const PurchaseOrderTab: FC<Props> = ({
         </div>
       </div>
       <DetailsColumn
-        freight={parseFloat(freight.toString())}
         setUnitPrices={setUnitPrices}
         setQuantites={setQuantites}
         quantites={quantites}

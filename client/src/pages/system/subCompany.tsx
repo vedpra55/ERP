@@ -14,13 +14,21 @@ const SubCompany: FC<Props> = ({}) => {
   const [isOpenModal, setModalOpen] = useState(false);
   const [nameText, setNameText] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const [selectedSubCompany, setSelectedSubCompany] = useState<any>();
 
   const handleSubmit = async () => {
     if (!nameText) {
       return setErrMsg("Name is required");
     }
 
-    await updateSubCompanyMutation.mutateAsync(nameText);
+    console.log(selectedSubCompany);
+
+    const value = {
+      name: nameText,
+      subCompanyId: selectedSubCompany?.sub_company_id,
+    };
+
+    await updateSubCompanyMutation.mutateAsync(value);
     setNameText("");
     setErrMsg("");
     setModalOpen(false);
@@ -46,8 +54,12 @@ const SubCompany: FC<Props> = ({}) => {
       header: "Action",
       accessor: "sub_company_id",
       colSpan: "2xl:col-span-2 md:col-span-3",
-      handleClick: () => {
-        setModalOpen(true);
+      handleClick: (index: number) => {
+        if (data) {
+          console.log(index);
+          setSelectedSubCompany(data[index]);
+          setModalOpen(true);
+        }
       },
     },
   ];

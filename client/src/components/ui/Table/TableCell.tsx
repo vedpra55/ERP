@@ -49,9 +49,10 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
   if (column.accessor === "sub_company_id" && column.handleClick) {
     return (
       <ActonColumn
+        index={index}
         field={item[column?.field || "sub_company_id"]}
         col={`${column.colSpan}`}
-        handleClick={column.handleClick}
+        handleClickWithVal={column.handleClick}
       />
     );
   }
@@ -137,7 +138,7 @@ const TableCell: React.FC<Props> = ({ column, item, index }) => {
     return <DateColumn date={item[column.accessor]} />;
   }
 
-  return <p>{item[column.accessor]}</p>;
+  return <p className=" truncate">{item[column.accessor]}</p>;
 };
 
 export default TableCell;

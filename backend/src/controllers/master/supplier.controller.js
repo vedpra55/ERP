@@ -76,15 +76,54 @@ export const createSupplier = async (req, res, next) => {
 export const getAllSupplier = async (req, res, next) => {
   try {
     const { user } = req.body;
+    const { searchText, count, page } = req.query;
 
-    const suppliers = await Prisma.inv_suppliers.findMany({
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { supplier_code: { contains: searchText, mode: "insensitive" } },
+            { supplier_name: { contains: searchText, mode: "insensitive" } },
+            { email: { contains: searchText, mode: "insensitive" } },
+          ],
+        },
+      ];
+    }
+
+    let take = 10;
+    if (count > 0) {
+      take = parseInt(count);
+    }
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    const totalCount = await Prisma.inv_suppliers.count({
       where: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
+        ...where,
       },
     });
+
+    const suppliers = await Prisma.inv_suppliers.findMany({
+      where,
+      orderBy: {
+        created_on: "desc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+    });
     res.status(200).json({
-      res: suppliers,
+      res: {
+        suppliers,
+        totalCount,
+      },
     });
   } catch (err) {
     next(err);

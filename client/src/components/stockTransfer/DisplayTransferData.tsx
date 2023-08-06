@@ -7,9 +7,11 @@ import useCreateMution from "@api/mutation";
 
 interface Props {
   data: StockTransferWithDetails;
+  toLocation: string;
+  fromLocation: string;
 }
 
-const DisplayTransferData: FC<Props> = ({ data }) => {
+const DisplayTransferData: FC<Props> = ({ data, toLocation, fromLocation }) => {
   const transferDate = new Date(data.transfer.transfer_dt);
   const acknowledgeDate = new Date(data.transfer?.acknowledge_dt);
 
@@ -17,15 +19,15 @@ const DisplayTransferData: FC<Props> = ({ data }) => {
 
   const handleAcknowledge = async () => {
     const item = {
-      fromLocation: data.transfer.from_location,
-      toLocation: data.transfer.to_location,
+      fromLocation: fromLocation,
+      toLocation: toLocation,
       transferNo: data.transfer.transfer_no,
     };
     await acknowledgeStockTransferMutation.mutateAsync(item);
   };
 
   return (
-    <div className="grid grid-cols-12 mt-10">
+    <div className="grid grid-cols-12 gap-x-5 mt-10">
       <div className="col-span-8 flex flex-col gap-y-1">
         <ItemColumn title="Transfer No" value={data.transfer.transfer_no} />
         <ItemColumn title="From Location" value={data.transfer.from_location} />
@@ -35,14 +37,18 @@ const DisplayTransferData: FC<Props> = ({ data }) => {
         {data.transfer.acknowledge_dt && (
           <div className="flex gap-x-10 ">
             <p className="w-80 ">Acknowledge Date:</p>
-            <p className="w-full">{`${acknowledgeDate.getDate()} / ${acknowledgeDate.getMonth()} / ${acknowledgeDate.getFullYear()}`}</p>
+            <p className="w-full">{`${acknowledgeDate.getDate()} / ${
+              acknowledgeDate.getMonth() + 1
+            } / ${acknowledgeDate.getFullYear()}`}</p>
           </div>
         )}
       </div>
       <div className="col-span-4 font-medium h-32 border rounded-md p-5">
         <div className="flex gap-x-10 mb-5">
           <p className="w-80 ">Tranfer Date:</p>
-          <p className="w-full">{`${transferDate.getDate()} / ${transferDate.getMonth()} / ${transferDate.getFullYear()}`}</p>
+          <p className="w-full">{`${transferDate.getDate()} / ${
+            transferDate.getMonth() + 1
+          } / ${transferDate.getFullYear()}`}</p>
         </div>
         {!data.transfer.acknowledge_dt ? (
           <AppButton

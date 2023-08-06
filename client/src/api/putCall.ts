@@ -30,6 +30,7 @@ export const updateSubCompanyName = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -76,6 +77,7 @@ export const updateCategory = async (values: departmentForm, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -99,6 +101,7 @@ export const updateLocation = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -122,6 +125,7 @@ export const updateSupplier = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -145,6 +149,7 @@ export const updateProduct = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -165,6 +170,7 @@ export const fullFillPurchaseOrder = async (values: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -189,6 +195,7 @@ export const acknowledgeStockTransfer = async (value: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -209,10 +216,11 @@ export const editUser = async (values: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
-export const editPurchaseOrder = async (values : any, token  : string) => {
+export const editPurchaseOrder = async (values: any, token: string) => {
   try {
     const { data } = await client.put(
       "transaction/purchaseOrder",
@@ -229,5 +237,6 @@ export const editPurchaseOrder = async (values : any, token  : string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
-}
+};

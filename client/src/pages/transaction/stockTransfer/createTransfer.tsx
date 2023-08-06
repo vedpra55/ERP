@@ -1,5 +1,5 @@
 import useCreateMution from "@api/mutation";
-import useApiServices from "@api/query";
+
 import StockTransferForm, {
   StockTransferFormValues,
 } from "@components/form/StockTransferForm";
@@ -9,6 +9,7 @@ import BackButton from "@components/ui/BackButton";
 
 import { FC, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Props {}
 
@@ -22,14 +23,16 @@ export type TransferDetails = {
 
 const CreateTransferPage: FC<Props> = ({}) => {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const { useFetchLocations, useFetchProducts, useFetchCategories } =
-    useApiServices();
+
   const { createStockTransferMutation } = useCreateMution();
-  const { data: locations } = useFetchLocations();
-  const { data: products } = useFetchProducts();
-  const { data: categories } = useFetchCategories();
+
   const [transferNo, setTransferNo] = useState<string>("");
   const [isStoreQtyLess, setStoreQtyLess] = useState(false);
+
+  const [toLocation, setToLocation] = useState<any>();
+  const [fromLocation, setFromLocation] = useState<any>();
+
+  const navigate = useNavigate();
 
   const [transferDetailsRow, setTransferDetailsRow] = useState<
     TransferDetails[]
@@ -43,12 +46,8 @@ const CreateTransferPage: FC<Props> = ({}) => {
     },
   ]);
 
-  const [fromLocation, setFromLocation] = useState("");
-
-  if (!locations || !products || !categories) return;
-
   const onSubmit = async (data: StockTransferFormValues) => {
-    if (data.fromLocation === data.toLocation) {
+    if (fromLocation.value === toLocation.value) {
       toast.error("Both locations are same");
       return;
     }
@@ -75,10 +74,18 @@ const CreateTransferPage: FC<Props> = ({}) => {
 
     const item = {
       ...data,
+      fromLocation: fromLocation.value,
+      toLocation: toLocation.value,
       products: transferDetailsRow,
       transferNo: transferNo,
     };
+
     await createStockTransferMutation.mutateAsync(item);
+
+    if (createStockTransferMutation.isError) return;
+
+    navigate("/app/transaction/transfer-creation");
+
     setTransferDetailsRow([
       {
         srl: "",
@@ -108,20 +115,21 @@ const CreateTransferPage: FC<Props> = ({}) => {
         />
       </div>
       <StockTransferForm
+        fromLocation={fromLocation?.value}
+        toLocation={toLocation?.value}
+        setFromLocation={setFromLocation}
+        setToLocation={setToLocation}
         handleOnChangeFromLocation={(val) => setFromLocation(val)}
         transfer={transferNo}
         setTransfer={setTransferNo}
         handleSubmitForm={onSubmit}
         submitButtonRef={submitButtonRef}
-        locations={locations}
       />
       <SelectTransferDetails
         setStoreQtyLess={setStoreQtyLess}
         setTransferDetailsRow={setTransferDetailsRow}
         transferDetailsRow={transferDetailsRow}
-        products={products}
-        categories={categories}
-        fromLocation={fromLocation}
+        fromLocation={fromLocation?.value}
       />
     </div>
   );

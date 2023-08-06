@@ -48,7 +48,9 @@ export const StockLevelReport = async (req, res, next) => {
     }
 
     if (!location || location?.length === 0 || departments?.length === 0) {
-      return next(createHttpError.BadRequest("No data found"));
+      return next(
+        createHttpError.BadRequest("There is no data for the filters")
+      );
     }
 
     const filter = {
@@ -61,7 +63,9 @@ export const StockLevelReport = async (req, res, next) => {
     const { summaryData, result } = await getSummaryData(filter, user);
 
     if (summaryData.length === 0) {
-      return next(createHttpError.BadRequest("No data found"));
+      return next(
+        createHttpError.BadRequest("There is no data for the filters")
+      );
     }
 
     const productQuantities = {};
@@ -189,6 +193,41 @@ export const StockLevelReport = async (req, res, next) => {
       return name.location_name;
     }
 
+    const productLocationQtyMap = {};
+
+    for (const department of result) {
+      for (const product of department.products) {
+        for (const location of product.locations) {
+          const key = `${product.product_code}_${location.location_code}`;
+          productLocationQtyMap[key] = location.qty_instock;
+        }
+      }
+    }
+
+    const qtyofEachLocationDepartment = {};
+
+    for (const department of result) {
+      const departmentCode = department.department_code;
+      qtyofEachLocationDepartment[departmentCode] = {};
+    }
+
+    // Update quantities based on data
+    for (const department of result) {
+      const departmentCode = department.department_code;
+
+      for (const product of department.products) {
+        for (const location of product.locations) {
+          const locationCode = location.location_code;
+          const qtyInStock = location.qty_instock;
+
+          const key = `${departmentCode}_${locationCode}`;
+          qtyofEachLocationDepartment[departmentCode][key] =
+            (qtyofEachLocationDepartment[departmentCode][key] || 0) +
+            qtyInStock;
+        }
+      }
+    }
+
     const htmlContent = `
     <!DOCTYPE html>
 <html lang="en">
@@ -200,64 +239,72 @@ export const StockLevelReport = async (req, res, next) => {
     html {
       -webkit-print-color-adjust: exact;
     }
-      body,
-      h1,
-      h2,
-      h3,
-      h4,
-      p {
-        padding: 0;
-        margin: 0;
-      }
-      .mainContainer {
-        margin-left: 50px;
-        margin-right: 50px;
-      }
-      .infoContainer {
-        margin-top: 40px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-      }
-      .queryDataContainer {
-        margin-bottom: 10px;
-        font-weight: 600;
-        width: 300px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .grid-container {
-        display: grid;
-        grid-template-columns: 0.5fr 0.5fr 3fr 0.5fr;
-      }
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      padding: 0;
+      margin: 0;
+    }
+    .mainContainer {
+      margin-left: 25px;
+      margin-right: 25px;
+      margin-bottom: 50px;
+    }
+    .infoContainer {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .queryDataContainer {
+      margin-bottom: 10px;
+      font-weight: 600;
+      width: 300px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-      .grid-item {
-        background-color: #f2f2f2;
-        padding: 5px;
-        text-align: center;
-        border: 1px solid;
-        font-size: 14px;
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-      .smallest {
-        grid-column: 1, 4;
-      }
+    th {
+      padding: 8px;
+      font-size: 12px;
+      text-align: left;
+      border: 1px solid black; /* Border for the cells */
+    }
 
-      .largest {
-        grid-column: 3;
-      }
-      .grid-container2 {
-        display: grid;
-        grid-template-columns: repeat(9, 1fr);
-      }
+    .darkHeading {
+      font-weight: bold;
+      background-color: rgba(128, 128, 128, 0.4);
+    }
 
-      .grid-item2 {
-        background-color: #f2f2f2;
-        padding: 5px;
-        border: 1px solid;
-        font-size: 14px;
-      }
+    .darkHeading2 {
+      font-weight: bold;
+      font-size: 12px;
+      background-color: rgba(128, 128, 128, 0.2);
+    }
+
+    td {
+      font-size: 12px;
+      padding: 8px;
+      text-align: left;
+      border: 1px solid black; /* Border for the cells */
+    }
+
+    .alignRight {
+      text-align: right;
+    }
+
+    .hideBorder {
+      border: 0px solid black;
+    }
     </style>
   </head>
   <body>
@@ -272,111 +319,120 @@ export const StockLevelReport = async (req, res, next) => {
         <div>
           <div class="queryDataContainer">
             <p>Location</p>
-            <p>${locStatus}</p>
+            <p style="font-weight: 400">${locStatus}</p>
           </div>
           <div class="queryDataContainer">
             <p>Department</p>
-            <p>${deparmentStatus}</p>
+            <p style="font-weight: 400">${deparmentStatus}</p>
           </div>
           <div class="queryDataContainer">
             <p>Closed</p>
-            <p>All</p>
+            <p style="font-weight: 400">All</p>
           </div>
           <div class="queryDataContainer">
             <p>Status</p>
-            <p>${status.type} ${status.value}</p>
+            <p style="font-weight: 400">${status.type} ${status.value}</p>
           </div>
         </div>
         <div style="font-weight: 600">
-          <p>Date : <span style="margin-left: 30px">28/06/2023</span></p>
+          <p>Date : <span style="margin-left: 30px;font-weight: 400">28/06/2023</span></p>
         </div>
       </section>
-      ${result
-        ?.map(
-          (mainItem, index) =>
+
+
+      <table>
+          ${result
+            .map(
+              (mainItem, index) => `
+          <thead class="darkHeading">
+          <tr>
+            <th style="width: 20px" colspan="1">Department</th>
+            <th style="width: 100px" colspan="1">${
+              mainItem.department_code
+            }</th>
+            <th style="text-align: center" colspan=${
+              allLocationCodes.length
+            }>${getDepartmentName(mainItem.department_code)}</th>
+            <th class="1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+              ${allLocationCodes
+                .map(
+                  (loc) => `
+              <td class="darkHeading2">${getLocationName(loc)}</td>
+              `
+                )
+                .join(" ")}
+            <td class="darkHeading2"></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td style="font-weight: bold">Products</td>
+            ${allLocationCodes
+              .map(
+                (loc) => `
+            <td></td>
             `
-        <div class="grid-container">
-          <div class="grid-item smallest">Department</div>
-          <div class="grid-item">${mainItem.department_code}</div>
-          <div class="grid-item largest">${getDepartmentName(
-            mainItem.department_code
-          )}</div>
-          <div class="grid-item smallest"></div>
-        </div>
-        <div class="grid-container2">
-        <div style="background-color: white" class="grid-item2"></div>
-        <div class="grid-item2"></div>
+              )
+              .join(" ")}
+            <td style="text-align: right" class="darkHeading2">Total</td>
+          </tr>
 
-        ${allLocationCodes
-          .map(
-            (loc) => ` <div class="grid-item2">${getLocationName(loc)}</div>`
-          )
-          .join(" ")}
-        <div class="grid-item2"></div>
-      </div>
-      <div class="grid-container2">
-        <div style="background-color: white" class="grid-item2"></div>
-        <div class="grid-item2">Product</div>
-        ${allLocationCodes
-          .map(
-            (loc) =>
-              ` <div style="background-color: white" class="grid-item2"></div>`
-          )
-          .join(" ")}
-      <div class="grid-item2">Total</div>
-    </div>
-
-    ${mainItem.products
-      .map(
-        (res, i) =>
+          ${mainItem.products
+            .map(
+              (res, i) => `
+          <tr>
+          <td></td>
+          <td>${res.product_code}</td>
+       
+          ${allLocationCodes
+            .map(
+              (location, locIndex) => `
+              <td class="alignRight">${
+                productLocationQtyMap[`${res.product_code}_${location}`] || 0
+              }</td>
           `
-      <div class="grid-container2">
-      <div style="background-color: white" class="grid-item2"></div>
-      <div style="background-color: white" class="grid-item2">${
-        res.product_code
-      }</div>
-      ${allLocationCodes
-        .map(
-          (item, ii) =>
-            `<div style="background-color: white" class="grid-item2">
-          ${
-            res.locations[ii]?.location_code === item
-              ? res.locations[ii]?.qty_instock
-              : 0
-          }
-        </div>`
-        )
+            )
+            .join(" ")}
 
-        .join(" ")}
-        <div style="background-color: white" class="grid-item2">${
-          productQuantities[res.product_code]
-        }</div>
-    </div>
-      `
-      )
-      .join(" ")}
-        
-      <div class="grid-container2">
-      <div style="background-color: white" class="grid-item2"></div>
-      <div class="grid-item2">Total</div>
-
-
-
-        ${departmentQuantities[index].quantities
-          .map(
-            (item, i) => `<div class="grid-item2">${item.qty_instock}</div>
-
+         
+          <td style="text-align: right" class="darkHeading2">${
+            productQuantities[res.product_code]
+          }</td>
+        </tr>
           `
-          )
-          .join(" ")}  
-          <div class="grid-item2">${
-            mainDepartmentQuantities[index].total_qty_instock
-          }</div>
+            )
+            .join(" ")}
 
-    </div>
-      `
-        )
-        .join(" ")}
+
+          <tr>
+            <td></td>
+            <td class="darkHeading2" style="font-weight: bold">Total</td>
+            ${allLocationCodes
+              .map(
+                (loc, locIndex) => `
+            <td style="text-align: right" class="darkHeading2">${
+              qtyofEachLocationDepartment[mainItem.department_code][
+                `${mainItem.department_code}_${loc}`
+              ] || 0
+            }</td>
+            `
+              )
+              .join(" ")}
+
+            <td style="text-align: right" class="darkHeading2">${
+              mainDepartmentQuantities[index].total_qty_instock
+            }</td>
+          </tr>
+        </tbody>
+          `
+            )
+            .join(" ")}
+    </table>
 
     </main>
   </body>

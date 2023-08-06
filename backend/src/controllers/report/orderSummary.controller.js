@@ -37,7 +37,9 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
     );
 
     if (!purchaseOrder.length || !purchaseOrderDetails.length) {
-      return next(createHttpError.BadRequest("No data found"));
+      return next(
+        createHttpError.BadRequest("There is no data for the filters")
+      );
     }
 
     summary = purchaseOrder.map((order) => {
@@ -76,15 +78,20 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
     //const products = [];
 
     async function fetchProducts() {
-      const products = summary[0].purchaseOrderDetails?.map(
-        async (item2) =>
-          await fethProduct(item2.product_code, item2.department_code, user)
-      );
+      const products = summary.flatMap(async (summaryItem) => {
+        return await Promise.all(
+          summaryItem.purchaseOrderDetails.map(async (item2) => {
+            return await fethProduct(
+              item2.product_code,
+              item2.department_code,
+              user
+            );
+          })
+        );
+      });
 
-      // Use Promise.all to wait for all the async calls to complete
       return await Promise.all(products);
     }
-
     const products = await fetchProducts();
 
     // Launch a headless browser
@@ -105,63 +112,73 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
         html {
           -webkit-print-color-adjust: exact;
         }
-          body,
-          h1,
-          h2,
-          h3,
-          h4,
-          p {
-            padding: 0;
-            margin: 0;
-          }
-          .mainContainer {
-            margin-left: 25px;
-            margin-right: 25px;
-            margin-bottom: 50px;
-          }
-          .infoContainer {
-            margin-top: 40px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-          }
-          .infoItem {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            width: 350px;
-            row-gap: 10px;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 14px;
-          }
-          .grid-container {
-            display: grid;
-            align-content: center;
-            grid-template-columns: 1fr 4fr 1fr 1fr 1fr 1fr 1fr;
-          }
-          .grid-item {
-            font-size: 12px;
-            padding: 5px;
-            border: 1px solid;
-          }
-          .smallest {
-            grid-column: 1;
-          }
-    
-          .largest {
-            grid-column: 2;
-          }
-          .grid-container2 {
-            display: grid;
-            align-content: center;
-            grid-template-columns: 1fr 2fr 1fr 1fr 2fr 1fr 1fr 1fr;
-          }
-          .grid-container3 {
-            display: grid;
-            align-content: center;
-            grid-template-columns: 1fr 8fr 1fr;
-          }
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        p {
+          padding: 0;
+          margin: 0;
+        }
+        .mainContainer {
+          margin-left: 25px;
+          margin-right: 25px;
+          margin-bottom: 50px;
+        }
+        .infoContainer {
+          margin-top: 40px;
+          margin-bottom: 20px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .infoItem {
+          margin-bottom: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          width: 300px;
+          row-gap: 10px;
+          justify-content: space-between;
+          font-weight: 600;
+          font-size: 14px;
+        }
+  
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+  
+        th {
+          padding: 8px;
+          font-size: 12px;
+          text-align: left;
+          border: 1px solid black; /* Border for the cells */
+        }
+  
+        .darkHeading {
+          font-weight: bold;
+          background-color: rgba(128, 128, 128, 0.4);
+        }
+  
+        .darkHeading2 {
+          font-weight: bold;
+          background-color: rgba(128, 128, 128, 0.2);
+        }
+  
+        td {
+          font-size: 12px;
+          padding: 8px;
+          text-align: left;
+          border: 1px solid black; /* Border for the cells */
+        }
+  
+        .alignRight {
+          text-align: right;
+        }
+  
+        .hideBorder {
+          border: 0px solid black;
+        }
         </style>
       </head>
       <body>
@@ -175,115 +192,113 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
           <section class="infoContainer">
             <section>
               <div class="infoItem">
-                <p>Supplier: <span style="margin-left: 10px">${
+                <p>Supplier: <span style="margin-left: 10px;font-weight: 400">${
                   supplier.supplier_code
                 }</span></p>
                 <p>
-                  <span>${supplier.supplier_name}</span>
+                  <span style="font-weight: 400">${
+                    supplier.supplier_name
+                  }</span>
                 </p>
               </div>
               <div class="infoItem">
-                <p>PO Date: <span style="margin-left: 10px">${poDate}</span></p>
+                <p>PO Date: <span style="margin-left: 10px; font-weight: 400">${poDate}</span></p>
                 <p>
-                  PO To Date: <span style="margin-left: 10px">${poToDate}</span>
+                  PO To Date: <span style="margin-left: 10px; font-weight: 400">${poToDate}</span>
                 </p>
               </div>
               <div class="infoItem">
-                <p>Status: <span style="margin-left: 10px">${status}</span></p>
+                <p>Status: <span style="margin-left: 10px;font-weight: 400">${status}</span></p>
               </div>
             </section>
             <section>
-              <p style="font-weight: 600">Date : <span>12/06/2023</span></p>
+              <p style="font-weight: 600">Date : <span style="font-weight: 400">${new Date(
+                summary[0].purchaseOrder.order_dt
+              ).getDate()} / ${
+      new Date(summary[0].purchaseOrder.order_dt).getMonth() + 1
+    } / ${new Date(summary[0].purchaseOrder.order_dt).getFullYear()}</span></p>
             </section>
           </section>
-          <div>
-            ${summary
-              .map(
-                (item, index) =>
-                  `
-                <div class="grid-container">
-                <div style="background-color: #f2f2f2" class="grid-item smallest">
-                  Supplier
-                </div>
-                <div style="background-color: #f2f2f2" class="grid-item">Name</div>
-                <div style="background-color: #f2f2f2" class="grid-item">Order #</div>
-                <div style="background-color: #f2f2f2" class="grid-item">Date</div>
-                <div style="background-color: #f2f2f2" class="grid-item">Amount</div>
-                <div style="background-color: #f2f2f2" class="grid-item">Paid</div>
-                <div style="background-color: #f2f2f2" class="grid-item">Balance</div>
-              </div>
-              <div class="grid-container">
-              <div class="grid-item smallest">${supplier.supplier_code}</div>
-              <div class="grid-item">${supplier.supplier_name}</div>
-              <div class="grid-item">${item.purchaseOrder.order_no}</div>
-              <div class="grid-item">${new Date(
-                item.purchaseOrder.order_dt
-              ).getDate()} / 
-              ${new Date(item.purchaseOrder.order_dt).getMonth() + 1} / 
-              ${new Date(item.purchaseOrder.order_dt).getFullYear()}
-              </div>
-              <div class="grid-item">${item.purchaseOrder.order_amount}</div>
-              <div class="grid-item">${item.purchaseOrder.amount_paid}</div>
-              <div class="grid-item">${
-                item.purchaseOrder.order_amount - item.purchaseOrder.amount_paid
-              }</div>
-            </div>
-            
-            <div class="grid-container2">
-              <div class="grid-item smallest"></div>
-              <div style="background-color: #f2f2f2" class="grid-item">Serial</div>
-              <div style="background-color: #f2f2f2" class="grid-item">
-                Department
-              </div>
-              <div style="background-color: #f2f2f2" class="grid-item">Product</div>
-              <div style="background-color: #f2f2f2" class="grid-item">
-                Description
-              </div>
-              <div style="background-color: #f2f2f2" class="grid-item">
-                Unit Price
-              </div>
-              <div style="background-color: #f2f2f2" class="grid-item">Qty</div>
-              <div style="background-color: #f2f2f2" class="grid-item">Value</div>
-            </div>
-            ${item.purchaseOrderDetails
-              ?.map((item2, i) => {
-                return `
-                <div class="grid-container2">
-                <div class="grid-item smallest"></div>
-                <div class="grid-item">${item2.serial_no}</div>
-                <div class="grid-item">${item2.department_code}</div>
-                <div class="grid-item">${item2.product_code}</div>
-                <div class="grid-item">${products[i].product_description}</div>
-                <div class="grid-item">${item2.cost_fc}</div>
-                <div class="grid-item">${item2.qty_ordered}</div>
-                <div class="grid-item">${
-                  item2.cost_fc * item2.qty_ordered
-                }</div>
-                </div>
-            `;
-              })
-              .join("")}
-    
-              ${`
-                <div class="grid-container3">
-              <div class="grid-item"></div>
-              <div style="text-align: center" class="grid-item">Total</div>
-              <div class="grid-item">${
-                subtotalByOrder[item.purchaseOrder.order_no]
-              }</div>
-                `}
-            </div>
-                `
-              )
-              .join("")}
 
-                ${`
-                <div class="grid-container3">
-              <div class="grid-item"></div>
-              <div style="text-align: center" class="grid-item">Report Total</div>
-              <div class="grid-item">${reportTotal}</div>
-                `}
-            </div>
+          <table>
+           ${summary
+             .map(
+               (item, index) => `
+     
+           <thead class="darkHeading">
+             <tr>
+               <th>Supplier</th>
+               <th colspan="2">Name</th>
+               <th>Order#</th>
+               <th>Date</th>
+               <th>Amount</th>
+               <th>Paid</th>
+               <th colspan="2">Balance</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>${supplier.supplier_code}</td>
+               <td colspan="2">${supplier.supplier_name}</td>
+               <td>${item.purchaseOrder.order_no}</td>
+               <td>${new Date(item.purchaseOrder.order_dt).getDate()} / 
+              ${new Date(item.purchaseOrder.order_dt).getMonth() + 1} / 
+              ${new Date(item.purchaseOrder.order_dt).getFullYear()}</td>
+               <td class="alignRight">${item.purchaseOrder.order_amount}</td>
+               <td class="alignRight">${item.purchaseOrder.amount_paid}</td>
+               <td class="alignRight" colspan="2">${
+                 item.purchaseOrder.order_amount -
+                 item.purchaseOrder.amount_paid
+               }</td>
+             </tr>
+             <tr class="darkHeading2">
+               <td></td>
+               <td>Serial</td>
+               <td>Department</td>
+               <td>Product</td>
+               <td>Description</td>
+               <td>Unit Price</td>
+               <td>Qty</td>
+               <td>Value</td>
+             </tr>
+               ${item.purchaseOrderDetails
+                 .map(
+                   (item2, i) => `
+               <tr>
+               <td></td>
+               <td>${item2.serial_no}</td>
+               <td>${item2.department_code}</td>
+               <td>${item2.product_code}</td>
+               <td>${products[index][i].product_description}</td>
+               <td class="alignRight">${item2.cost_fc}</td>
+               <td class="alignRight">${item2.qty_ordered}</td>
+               <td class="alignRight">${item2.cost_fc * item2.qty_ordered}</td>
+             </tr>
+               `
+                 )
+                 .join(" ")}
+           </tbody>
+           <tr>
+           <td class="darkHeading2" style="text-align: center" colspan="7">
+             Total
+           </td>
+           <td class="alignRight">${
+             subtotalByOrder[item.purchaseOrder.order_no]
+           }</td>
+         </tr>
+           `
+             )
+             .join(" ")}   
+
+             <tr>
+             <td class="darkHeading" style="text-align: center" colspan="7">
+               Report Total
+             </td>
+             <td class="alignRight">${reportTotal}</td>
+           </tr>
+             </table>    
+
+              
     
         </main>
       </body>

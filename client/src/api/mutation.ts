@@ -41,12 +41,14 @@ const useCreateMution = () => {
     (roleName: string) =>
       createRole(roleName, user.subCompanyId, user.access_token),
     {
-      onError: (error) => {
-        console.log(error);
+      onError: (error: any) => {
+        toast.error(error);
       },
       onSuccess: (data: string) => {
         queryClient.invalidateQueries({ queryKey: ["roles"] });
-        toast.success(data);
+        if (data != "") {
+          toast.success(data);
+        }
       },
     }
   );
@@ -88,10 +90,10 @@ const useCreateMution = () => {
   );
 
   const updateSubCompanyMutation = useMutation(
-    (name: string) =>
+    (value: any) =>
       updateSubCompanyName(
-        name,
-        user.subCompanyId,
+        value.name,
+        value.subCompanyId,
         user.companyId,
         user.access_token
       ),
@@ -124,10 +126,11 @@ const useCreateMution = () => {
     (values: departmentForm) => createCategory(values, user.access_token),
     {
       onError: (error) => {
-        console.log(error);
+        console.log(error, "erro");
       },
       onSuccess: (data: string) => {
         queryClient.invalidateQueries({ queryKey: ["categories"] });
+
         toast.success(data);
       },
     }
@@ -283,7 +286,7 @@ const useCreateMution = () => {
         console.log(error);
       },
       onSuccess: (data: string) => {
-        queryClient.invalidateQueries({ queryKey: ["stock-transfers"] });
+        queryClient.invalidateQueries({ queryKey: ["stock-transfer"] });
         toast.success(data);
       },
     }

@@ -31,4 +31,25 @@ body {
   .scrrenColor {
     @apply bg-indigo-700 mymd:bg-lime-800 mylg5:bg-black mylg4:bg-yellow-500 mylg3:bg-orange-600  mylg2:bg-teal-800 mylg:bg-green-500 myXl:bg-blue-500 2xl:bg-red-500;
   }
+
+  .paginationContainer {
+    @apply flex items-center flex-wrap gap-y-5 gap-x-2 xl:gap-x-4 2xl:gap-x-5 mt-10;
+  }
+
+  .page-item {
+    @apply w-5 h-5 text-[8px]  font-semibold md:text-[16px] md:w-8 md:h-8 flex items-center justify-center border  border-gray-400 rounded-md hover:bg-black hover:text-white;
+  }
+
+  .page-item a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .selected-page {
+    @apply opacity-100 bg-black text-white border-0;
+  }
+
+  .toggle-item {
+    @apply rounded-md  text-xs md:text-[16px] hover:text-blue-500;
+  }
 }

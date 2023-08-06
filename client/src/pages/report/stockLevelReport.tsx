@@ -1,4 +1,3 @@
-import useApiServices from "@api/query";
 import StockLevelReportForm from "@components/form/StockLevelReportForm";
 import { useAuthContext } from "@context/AuthContext";
 import { FC, useState } from "react";
@@ -17,11 +16,8 @@ export type StockLevelReportParameter = {
 };
 
 const StockLevelReport: FC<Props> = ({}) => {
-  const { useFetchLocations, useFetchCategories } = useApiServices();
   const { user } = useAuthContext();
-  const { data: categories } = useFetchCategories();
-  const { data: locations } = useFetchLocations();
-
+  const [isLoading, setLoading] = useState(false);
   const [parameters, setParameters] = useState<StockLevelReportParameter>({
     departmentCode: [],
     locationCode: "All",
@@ -34,6 +30,8 @@ const StockLevelReport: FC<Props> = ({}) => {
 
   const handleDownload = async () => {
     const API = `${import.meta.env.VITE_API_URI}/report/stockLevelReport`;
+
+    setLoading(true);
 
     const item = {
       ...parameters,
@@ -71,17 +69,16 @@ const StockLevelReport: FC<Props> = ({}) => {
     } catch (err: any) {
       console.log(err);
     }
-  };
 
-  if (!categories || !locations) return;
+    setLoading(false);
+  };
 
   return (
     <div>
       <h1 className="font-semibold text-2xl">Stock Level Report</h1>
       <StockLevelReportForm
+        isLoading={isLoading}
         handleDownload={handleDownload}
-        categories={categories}
-        locations={locations}
         parameters={parameters}
         setParameters={setParameters}
       />

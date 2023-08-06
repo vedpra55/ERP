@@ -13,7 +13,9 @@ const DateInput: FC<Props> = ({ placeholder, register, name, errorMsg }) => {
       {errorMsg && (
         <p className=" text-[14px] text-red-400 tracking-normal">{errorMsg}</p>
       )}
-      <label className="text-[14px]  tracking-wider">{placeholder} :</label>
+      <label className="text-[14px]  tracking-wider font-medium">
+        {placeholder} :
+      </label>
       <div>
         <input
           name={name}
@@ -44,7 +46,9 @@ export const DateInputNoraml: FC<Props2> = ({
       {errorMsg && (
         <p className=" text-[14px] text-red-400 tracking-normal">{errorMsg}</p>
       )}
-      <label className="text-[14px]  tracking-wider">{placeholder} :</label>
+      <label className="text-[14px]  tracking-wider font-medium">
+        {placeholder} :
+      </label>
       <div>
         <input
           name={name}

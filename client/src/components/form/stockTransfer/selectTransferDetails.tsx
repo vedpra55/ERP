@@ -1,11 +1,10 @@
-import { Category, Product } from "@@types/system";
 import { FC } from "react";
 import SelectTransferRow from "./selectTransferRow";
 import { TransferDetails } from "@pages/transaction/stockTransfer/createTransfer";
+import { fetchSingleProduct } from "@api/getCalls";
+import { useAuthContext } from "@context/AuthContext";
 
 interface Props {
-  products: Product[];
-  categories: Category[];
   transferDetailsRow: TransferDetails[];
   setTransferDetailsRow: any;
   fromLocation: string;
@@ -13,19 +12,19 @@ interface Props {
 }
 
 const SelectTransferDetails: FC<Props> = ({
-  products,
-  categories,
   transferDetailsRow,
   setTransferDetailsRow,
   fromLocation,
   setStoreQtyLess,
 }) => {
+  const { user } = useAuthContext();
+
   const handleInputChange = (e: any, index: number) => {
     const { value, name } = e.target;
     const list = [...transferDetailsRow];
 
     const list2 = [...transferDetailsRow];
-    list2[index]["srl"] = index.toString();
+    list2[index]["srl"] = (index + 1).toString();
 
     if (name === "departmentCode") {
       list[index]["departmentCode"] = value;
@@ -38,10 +37,29 @@ const SelectTransferDetails: FC<Props> = ({
       list[index]["productCode"] = value;
       setTransferDetailsRow(list);
 
-      const product = products.filter((res) => res.product_code === value)[0];
-      const list2 = [...transferDetailsRow];
-      list2[index]["description"] = product.product_description;
-      setTransferDetailsRow(list2);
+      let productDescription = "";
+
+      fetchSingleProduct(
+        value,
+        transferDetailsRow[index].departmentCode,
+        user.access_token
+      )
+        .then((res) => {
+          if (res?.product) {
+            productDescription = res?.product.product_description;
+          }
+
+          const list2 = [...transferDetailsRow];
+          list2[index]["description"] = productDescription;
+          setTransferDetailsRow(list2);
+        })
+        .catch((err) => {
+          console.log(err);
+
+          const list2 = [...transferDetailsRow];
+          list2[index]["description"] = "";
+          setTransferDetailsRow(list2);
+        });
     }
 
     if (name === "quantity") {
@@ -77,8 +95,6 @@ const SelectTransferDetails: FC<Props> = ({
         <SelectTransferRow
           setStoreQtyLess={setStoreQtyLess}
           transferDetails={transferDetailsRow}
-          products={products}
-          categories={categories}
           index={index}
           handleInputChange={handleInputChange}
           removeRow={handleRemoveRow}

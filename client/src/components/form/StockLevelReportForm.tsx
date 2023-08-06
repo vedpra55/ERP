@@ -1,24 +1,26 @@
-import { Category, Location } from "@@types/system";
+import { Location } from "@@types/system";
+import { fetchSingleCategory, fetchSingleLocation } from "@api/getCalls";
+import SelectDepartment from "@components/input/SelectDepartment";
 import { SelecteInputNormal } from "@components/input/SelectInput";
+import SelectLocation from "@components/input/SelectLocaton";
 import AppButton from "@components/ui/AppButton";
+import { useAuthContext } from "@context/AuthContext";
 import { StockLevelReportParameter } from "@pages/report/stockLevelReport";
 import { FC, useEffect, useState } from "react";
 import { GrFormClose } from "react-icons/gr";
 
 interface Props {
-  categories: Category[];
-  locations: Location[];
   parameters: StockLevelReportParameter;
   setParameters: any;
   handleDownload(): void;
+  isLoading: boolean;
 }
 
 const StockLevelReportForm: FC<Props> = ({
-  categories,
-  locations,
   parameters,
   setParameters,
   handleDownload,
+  isLoading,
 }) => {
   const [selectedDepartmet, setSelectedDepartmet] = useState<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location[]>();
@@ -51,16 +53,19 @@ const StockLevelReportForm: FC<Props> = ({
 
       if (isExit) return;
 
-      const selectedIndex = selectedDepartmet.indexOf(value);
-      const item = categories.filter((res) => res.department_code === value)[0];
+      fetchSingleCategory(value, user.access_token).then((item) => {
+        if (item) {
+          const selectedIndex = selectedDepartmet.indexOf(value);
 
-      if (selectedIndex !== -1) {
-        const updatedSelectedItems = [...selectedDepartmet];
-        updatedSelectedItems.splice(selectedIndex, 1);
-        setSelectedDepartmet(updatedSelectedItems);
-      } else {
-        setSelectedDepartmet((prevSelected) => [...prevSelected, item]);
-      }
+          if (selectedIndex !== -1) {
+            const updatedSelectedItems = [...selectedDepartmet];
+            updatedSelectedItems.splice(selectedIndex, 1);
+            setSelectedDepartmet(updatedSelectedItems);
+          } else {
+            setSelectedDepartmet((prevSelected) => [...prevSelected, item]);
+          }
+        }
+      });
 
       setChange(!change);
     }
@@ -99,18 +104,21 @@ const StockLevelReportForm: FC<Props> = ({
     setSelectedDepartmet(items);
   }
 
+  const { user } = useAuthContext();
+
   useEffect(() => {
     if (parameters.locationCode) {
-      const items = locations.filter(
-        (res) => res.location_code === parameters.locationCode
+      fetchSingleLocation(parameters.locationCode, user.access_token).then(
+        (item) => {
+          if (item) {
+            setSelectedLocation([item]);
+          }
+        }
       );
-
-      setSelectedLocation(items);
     }
   }, [change]);
 
   useEffect(() => {
-    console.log(selectedDepartmet);
     setParameters({
       ...parameters,
       departmentCode: selectedDepartmet,
@@ -120,18 +128,17 @@ const StockLevelReportForm: FC<Props> = ({
   return (
     <>
       <div className="grid grid-cols-12 gap-5 mb-5 items-end mt-10">
-        <SelecteInputNormal
-          optionl="All"
-          data={categories}
-          accessor="department_code"
-          handleChange={handleOnInputChange}
-          name="departmentCode"
-          label="Department Code"
-        />
-        <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
-          {selectedDepartmet?.map(
-            (item) =>
-              item?.department_name && (
+        <div className="col-span-4">
+          <SelectDepartment
+            isAllValue
+            isShowLable
+            handleInputChange={handleOnInputChange}
+          />
+        </div>
+        {selectedDepartmet?.length > 0 && (
+          <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
+            {selectedDepartmet?.map((item) =>
+              item?.department_name ? (
                 <div
                   className="bg-gray-100 rounded-md flex items-center gap-x-2 px-3 py-1"
                   key={item?.department_code}
@@ -144,27 +151,31 @@ const StockLevelReportForm: FC<Props> = ({
                     <GrFormClose />
                   </div>
                 </div>
+              ) : (
+                <div>All</div>
               )
-          )}
+            )}
+          </div>
+        )}
+        <div className="col-span-4">
+          <SelectLocation
+            isAllValue
+            label="Location Code"
+            handleInputChange={handleOnInputChange}
+          />
         </div>
-        <SelecteInputNormal
-          data={locations}
-          optionl="All"
-          accessor="location_code"
-          handleChange={handleOnInputChange}
-          name="locationCode"
-          label="Location Code"
-        />
-        <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
-          {selectedLocation?.map((item) => (
-            <div
-              className="bg-gray-100 rounded-md flex items-center gap-x-2 px-3 py-1"
-              key={item.location_code}
-            >
-              {item.location_name}
-            </div>
-          ))}
-        </div>
+        {selectedLocation != undefined && selectedLocation.length > 0 && (
+          <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
+            {selectedLocation?.map((item) => (
+              <div
+                className="bg-gray-100 rounded-md flex items-center gap-x-2 px-3 py-1"
+                key={item.location_code}
+              >
+                {item.location_name}
+              </div>
+            ))}
+          </div>
+        )}
         <SelecteInputNormal
           data={[{ name: "Yes" }, { name: "No" }, { name: "All" }]}
           accessor="name"
@@ -174,7 +185,11 @@ const StockLevelReportForm: FC<Props> = ({
         />
         <StatusSelection handleOnInputChange={handleOnInputChange} />
       </div>
-      <AppButton handleOnClick={handleDownload} title="Download" />
+      <AppButton
+        isLoading={isLoading}
+        handleOnClick={handleDownload}
+        title="Download"
+      />
     </>
   );
 };
@@ -186,7 +201,7 @@ const StatusSelection: FC<{ handleOnInputChange: any }> = ({
 }) => {
   return (
     <div className="col-span-4 ">
-      <p className="text-[14px] tracking-wider">Status</p>
+      <p className="text-[14px] tracking-wider font-medium">Status</p>
       <div className="flex items-center gap-x-2">
         <select
           className="border outline-none  rounded-md py-2 px-5"

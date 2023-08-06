@@ -12,14 +12,11 @@ import { toast } from "react-hot-toast";
 const CreateCategoryPage = () => {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { createProductMutation } = useCreateMution();
-  const { useFetchCategories, useFetchSuppliers } = useApiServices();
-  const { data: categories } = useFetchCategories();
-  const { data: suppliers } = useFetchSuppliers();
+
   const navigate = useNavigate();
-
+  const [selectedDepartmentCode, setSelectedDepartmentCode] =
+    useState<any>(null);
   const [selectedSuppliers, setSelectedSuppliers] = useState<Supplier[]>([]);
-
-  if (!categories || !suppliers) return;
 
   const onSubmit = async (data: productFormValues) => {
     if (selectedSuppliers.length === 0) {
@@ -27,11 +24,19 @@ const CreateCategoryPage = () => {
       return;
     }
 
+    if (!selectedDepartmentCode?.value) {
+      toast.error("Please select department code");
+      return;
+    }
+
     const item = {
       ...data,
+      departmentCode: selectedDepartmentCode.value,
       selectedSuppliers,
     };
+
     await createProductMutation.mutateAsync(item);
+    if (createProductMutation.isError) return;
     navigate("/app/master/products");
   };
 
@@ -41,7 +46,7 @@ const CreateCategoryPage = () => {
         <div className="flex items-center gap-x-2">
           <BackButton />
           <h2 className="text-[14px] font-medium tracking-wider">
-            Create Location
+            Create Product
           </h2>
         </div>
         <AppButton
@@ -53,17 +58,15 @@ const CreateCategoryPage = () => {
         />
       </div>
       <ProductForm
+        setSelectedDepartmentCode={setSelectedDepartmentCode}
         handleSubmitForm={onSubmit}
-        categories={categories}
         submitButtonRef={submitButtonRef}
       />
-      {suppliers && (
-        <SelectSuppliers
-          selectedSuppliers={selectedSuppliers}
-          setSelectedSuppliers={setSelectedSuppliers}
-          suppliers={suppliers}
-        />
-      )}
+
+      <SelectSuppliers
+        selectedSuppliers={selectedSuppliers}
+        setSelectedSuppliers={setSelectedSuppliers}
+      />
     </div>
   );
 };

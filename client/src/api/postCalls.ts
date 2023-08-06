@@ -32,6 +32,7 @@ export const createRole = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -69,6 +70,7 @@ export const createUser = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -96,6 +98,7 @@ export const createSubCompany = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -116,6 +119,7 @@ export const createCategory = async (values: departmentForm, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -139,6 +143,7 @@ export const createSupplier = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -162,6 +167,7 @@ export const createLocation = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -185,6 +191,7 @@ export const createProduct = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -205,6 +212,7 @@ export const createPurchaseOrder = async (values: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -225,6 +233,7 @@ export const addPuchaseOrderPayment = async (values: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -245,5 +254,6 @@ export const createStockTransfer = async (values: any, token: string) => {
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };

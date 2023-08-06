@@ -190,7 +190,7 @@ export const editSubCompany = async (req, res, next) => {
         message: "Sub company name updated",
       });
     });
-  } catch {
+  } catch (err) {
     next(err);
   }
 };

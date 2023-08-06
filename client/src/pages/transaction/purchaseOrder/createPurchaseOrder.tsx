@@ -1,5 +1,4 @@
 import useCreateMution from "@api/mutation";
-import useApiServices from "@api/query";
 import PurchaseOrderForm, {
   OrderDetails,
   purchaseOrderFormValues,
@@ -14,14 +13,11 @@ import { purchaseOrderSchema } from "@utils/validator";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreatePurchaseOrder = () => {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const { createPurchaseOrderMutation } = useCreateMution();
-  const { useFetchLocations, useFetchSuppliers } = useApiServices();
-
-  const { data: suppliers } = useFetchSuppliers();
-  const { data: locations } = useFetchLocations();
 
   const {
     register,
@@ -45,12 +41,27 @@ const CreatePurchaseOrder = () => {
     },
   ]);
 
+  const [selectedSupplier, setSelectedSupplier] = useState<any>();
+  const [selectedLocation, setSelectedLocation] = useState<any>();
+
   const [subTotal, setSubTotal] = useState(0);
   const freight = watch("freight");
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data: purchaseOrderFormValues) => {
+    if (!selectedSupplier.value) {
+      toast.error("Please select supplier code");
+      return;
+    }
+
+    if (!selectedLocation.value) {
+      toast.error("Please select location code");
+      return;
+    }
+
     if (ordersData.length === 0) {
-      toast.error("Please Fill Products Column");
+      toast.error("Atleast 1 product record is required");
       return;
     }
 
@@ -61,7 +72,7 @@ const CreatePurchaseOrder = () => {
         !ordersData[i].productCode ||
         !ordersData[i].qtyBackorder
       ) {
-        return toast.error("Please Enter Products Row");
+        return toast.error("Please fill all column fields");
       }
     }
 
@@ -72,6 +83,8 @@ const CreatePurchaseOrder = () => {
 
     const items = {
       ...data,
+      supplierCode: selectedSupplier.value,
+      locationCode: selectedLocation.value,
       products: ordersData,
       paidAmount: 0,
       orderDate: new Date().toISOString(),
@@ -80,6 +93,9 @@ const CreatePurchaseOrder = () => {
     };
 
     await createPurchaseOrderMutation.mutateAsync(items);
+
+    if (createPurchaseOrderMutation.isError) return;
+    navigate("/app/transaction/purchase-order-creation");
   };
 
   useEffect(() => {
@@ -89,8 +105,6 @@ const CreatePurchaseOrder = () => {
     }
     setSubTotal(val);
   }, [ordersData]);
-
-  if (!suppliers || !locations) return;
 
   return (
     <div>
@@ -110,6 +124,10 @@ const CreatePurchaseOrder = () => {
         />
       </div>
       <PurchaseOrderForm
+        supplierCode={selectedSupplier?.value}
+        locationCode={selectedLocation?.value}
+        setSupplierCode={setSelectedSupplier}
+        setLocationCode={setSelectedLocation}
         register={register}
         reset={reset}
         watch={watch}
@@ -117,13 +135,9 @@ const CreatePurchaseOrder = () => {
         handleSubmit={handleSubmit}
         handleSubmitForm={onSubmit}
         submitButtonRef={submitButtonRef}
-        suppliers={suppliers}
-        locations={locations}
       />
       <SelectOrderDetails
-        totalOrderValue={
-          subTotal + (freight ? parseFloat(freight.toString()) : 0)
-        }
+        totalOrderValue={subTotal}
         orderDetailsRow={ordersData}
         setOrderDetailsRow={setOrderData}
       />

@@ -35,12 +35,21 @@ export type CreatedUser = {
   token: string;
 };
 
+export interface TotalCount {
+  totalCount: number;
+}
+
 export type Category = {
   department_code: string;
   department_name: string;
   closed_flag: boolean;
   created_on: Date;
   created_by: string;
+};
+
+export type CategoryWithTotalCount = {
+  category: Category[];
+  totalCount: TotalCount;
 };
 
 export type Location = {
@@ -50,7 +59,13 @@ export type Location = {
   closed_flag: boolean;
 };
 
+export type LocationWithTotalCount = {
+  location: Location[];
+  totalCount: TotalCount;
+};
+
 export type Product = {
+  department_name: string;
   department_code: string;
   product_code: string;
   product_description: string;
@@ -62,6 +77,11 @@ export type Product = {
   created_on: Date;
   created_by: string;
   selling_price: number;
+};
+
+export type ProductWithTotalCount = {
+  product: Product[];
+  totalCount: TotalCount;
 };
 
 export type Supplier = {
@@ -78,6 +98,11 @@ export type Supplier = {
   created_on: Date;
 };
 
+export type SupplierWithTotalCount = {
+  supplier: Supplier[];
+  totalCount: TotalCount;
+};
+
 export type ProductWithSupplier = {
   product: Product;
   suppliers: Supplier[];
@@ -88,6 +113,8 @@ export type PurchaseOrder = {
   location_code: string;
   order_dt: Date;
   supplier_code: string;
+  supplier: string;
+  location: string;
   eta: Date;
   currency: string;
   cost_rate: string;
@@ -100,6 +127,11 @@ export type PurchaseOrder = {
   closed_flag: boolean;
   fulfilled_flag: boolean;
   paid_flag: boolean;
+};
+
+export type PurchaseOrderWithTotalCount = {
+  purchaseOrder: PurchaseOrder[];
+  totalCount: TotalCount;
 };
 
 export type PurchaseOrderDetails = {
@@ -130,11 +162,18 @@ export type PurchaseOrderWithDetails = {
 export type StockTransfer = {
   from_location: string;
   to_location: string;
+  from_location_code: string;
+  to_location_code: string;
   transfer_no: string;
   transfer_dt: Date;
   acknowledge_dt: Date;
   received_by: string;
   remarks: string;
+};
+
+export type StockTransferWithTotalCount = {
+  stockTransfer: StockTransfer[];
+  totalCount: TotalCount;
 };
 
 export type StockTransferDetails = {

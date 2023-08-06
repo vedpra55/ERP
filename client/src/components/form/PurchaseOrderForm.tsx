@@ -1,21 +1,23 @@
-import { Supplier, Location } from "@@types/system";
+import { Supplier } from "@@types/system";
 
 import { FC, useEffect, useState } from "react";
 import AppInput from "@components/input/AppInput";
 import SelectInput from "@components/input/SelectInput";
 import DateInput from "@components/input/DateInput";
+import SelectSupplier from "@components/input/SelectSupplier";
+import SelectLocation from "@components/input/SelectLocaton";
+import { fetchSingleSupplier } from "@api/getCalls";
+import { useAuthContext } from "@context/AuthContext";
 
 export type purchaseOrderFormValues = {
   orderNo: string;
-  locationCode: string;
   dueDate: Date;
-  supplierCode: string;
   currency: string;
   costRate: number;
   supplierInvo: string;
   remarks: string;
   freight?: number;
-  nonVendorCost: number;
+  nonVendorCost?: number;
 };
 
 export type OrderDetails = {
@@ -29,8 +31,6 @@ export type OrderDetails = {
 };
 
 interface Props {
-  suppliers: Supplier[];
-  locations: Location[];
   handleSubmitForm(data: purchaseOrderFormValues): void;
   submitButtonRef: React.RefObject<HTMLButtonElement>;
   register?: any;
@@ -38,31 +38,42 @@ interface Props {
   handleSubmit?: any;
   errors: any;
   reset?: any;
+  locationCode?: any;
+  setLocationCode?: any;
+  supplierCode: any;
+  setSupplierCode: any;
 }
 
 const PurchaseOrderForm: FC<Props> = ({
-  suppliers,
-  locations,
   handleSubmitForm,
   submitButtonRef,
   register,
-  watch,
   handleSubmit,
   errors,
+  supplierCode,
+  setSupplierCode,
+  setLocationCode,
 }) => {
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier>();
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | any>();
 
-  const supplierCode = watch("supplierCode");
-  useEffect(() => {}, []);
+  const supplierCodeVal = supplierCode;
+  const { user } = useAuthContext();
 
   useEffect(() => {
-    if (supplierCode) {
-      const item = suppliers.filter(
-        (res) => res.supplier_code === supplierCode
-      )[0];
+    async function fethData() {
+      const data = await fetchSingleSupplier(
+        supplierCodeVal,
+        user.access_token
+      );
 
-      setSelectedSupplier(item);
+      if (data) {
+        setSelectedSupplier(data);
+      } else {
+        setSelectedSupplier([]);
+      }
     }
+
+    fethData();
   }, [supplierCode]);
 
   return (
@@ -79,16 +90,12 @@ const PurchaseOrderForm: FC<Props> = ({
         errorMsg={errors.orderNo?.message}
       />
 
-      <SelectInput
-        isShowSelect
-        accessor="supplier_code"
-        data={suppliers}
-        label="Supplier Code"
-        extraValAccessor="supplier_name"
-        name="supplierCode"
-        register={register}
-        closeCheck
-      />
+      <div className="col-span-4">
+        <SelectSupplier
+          label="Supplier Code"
+          setSelectedVal={setSupplierCode}
+        />
+      </div>
 
       <SelectedValue
         value={selectedSupplier?.supplier_code}
@@ -102,15 +109,12 @@ const PurchaseOrderForm: FC<Props> = ({
       <SelectedValue value={selectedSupplier?.email} title="Email" />
       <SelectedValue value={selectedSupplier?.address_1} title="Address" />
 
-      <SelectInput
-        accessor="location_code"
-        data={locations}
-        extraValAccessor="location_name"
-        label="Location Code"
-        name="locationCode"
-        register={register}
-        closeCheck
-      />
+      <div className="col-span-4">
+        <SelectLocation
+          label="Location Code"
+          setSelectedVal={setLocationCode}
+        />
+      </div>
 
       <AppInput
         name="remarks"
@@ -178,8 +182,10 @@ const SelectedValue: FC<{ value?: string | number; title: string }> = ({
 }) => {
   return (
     <div className="col-span-4 flex gap-y-1 flex-col">
-      <p className="text-[14px] tracking-wider">{title}</p>
-      <div className=" bg-gray-50 rounded-md 2xl:w-80 py-2 px-5">{value}</div>
+      <p className="text-[14px] tracking-wider font-medium">{title}</p>
+      <div className=" bg-gray-50 rounded-md 2xl:w-80 py-2 px-5   truncate">
+        {value}
+      </div>
     </div>
   );
 };

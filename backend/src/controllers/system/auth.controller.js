@@ -223,7 +223,7 @@ export const signin = async (req, res, next) => {
 
   try {
     await Prisma.$transaction(async (Prisma) => {
-      const user = await Prisma.sys_users.findFirst({
+      let user = await Prisma.sys_users.findFirst({
         where: {
           email: email,
         },
@@ -239,7 +239,7 @@ export const signin = async (req, res, next) => {
         return next(createHttpError.BadRequest("Wrong Password"));
       }
 
-      const access_token = generateAuthToken(
+      let access_token = generateAuthToken(
         user.email,
         user.company_id,
         user.sub_company_id
@@ -269,6 +269,26 @@ export const signin = async (req, res, next) => {
             message: "Please Select Sub Company",
           },
         });
+      }
+
+      if (
+        subCompanyId &&
+        user &&
+        user.role_name === "admin" &&
+        allSubCompany.length > 1
+      ) {
+        user = await Prisma.sys_users.findFirst({
+          where: {
+            email: email,
+            sub_company_id: parseInt(subCompanyId),
+          },
+        });
+
+        access_token = generateAuthToken(
+          user.email,
+          user.company_id,
+          user.sub_company_id
+        );
       }
 
       res.status(200).json({

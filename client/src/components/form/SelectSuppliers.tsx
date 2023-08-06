@@ -1,19 +1,26 @@
 import { Supplier } from "@@types/system";
+import useApiServices from "@api/query";
+import Pagination from "@components/ui/Pagination";
 import SelectTable, {
   SelectTableColumn,
 } from "@components/ui/Table/SelectTable";
+import { useState } from "react";
 
 interface Props {
-  suppliers: Supplier[];
   selectedSuppliers: Supplier[];
   setSelectedSuppliers: any;
 }
 
 const SelectSuppliers: React.FC<Props> = ({
-  suppliers,
   selectedSuppliers,
   setSelectedSuppliers,
 }) => {
+  const { useFetchSuppliers } = useApiServices();
+
+  const [pageNo, setPageNo] = useState(1);
+
+  const { data: suppliers } = useFetchSuppliers("", null, pageNo);
+
   const supplierColumn: SelectTableColumn[] = [
     {
       header: "supplier Code",
@@ -52,13 +59,17 @@ const SelectSuppliers: React.FC<Props> = ({
   ];
 
   const handleSelect = (code: string) => {
-    if (selectedSuppliers?.length > 0) {
-      const item = suppliers.filter((res) => res.supplier_code === code)[0];
+    if (selectedSuppliers?.length > 0 && suppliers) {
+      const item = suppliers.supplier.filter(
+        (res) => res.supplier_code === code
+      )[0];
       setSelectedSuppliers([...selectedSuppliers, item]);
     } else {
       let newArray = [];
 
-      const item = suppliers.filter((res) => res.supplier_code === code)[0];
+      const item = suppliers?.supplier.filter(
+        (res) => res.supplier_code === code
+      )[0];
       newArray.push(item);
       setSelectedSuppliers(newArray);
     }
@@ -97,13 +108,19 @@ const SelectSuppliers: React.FC<Props> = ({
       )}
       <div className="border rounded-md p-5 mt-5">
         <p className="font-medium">All Suppliers</p>
-        <SelectTable
-          isSelectedItem={isSelectedItem}
-          selectedItems={selectedSuppliers}
-          handleSelect={handleSelect}
-          columns={supplierColumn}
-          data={suppliers}
-          from="main"
+        {suppliers && (
+          <SelectTable
+            isSelectedItem={isSelectedItem}
+            selectedItems={selectedSuppliers}
+            handleSelect={handleSelect}
+            columns={supplierColumn}
+            data={suppliers.supplier}
+            from="main"
+          />
+        )}
+        <Pagination
+          setPageNo={setPageNo}
+          totalItem={suppliers?.totalCount.totalCount}
         />
       </div>
     </div>

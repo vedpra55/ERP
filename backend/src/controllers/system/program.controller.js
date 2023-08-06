@@ -7,98 +7,82 @@ export const getCompanyProgram = async (req, res, next) => {
     const { user } = req.body;
 
     if (!roleName) {
-      next(createHttpError.BadRequest("Please provide all fields"));
+      return next(createHttpError.BadRequest("Please provide all fields"));
     }
 
-    const sys_roleProgram = await Prisma.sys_roleprograms.findMany({
-      where: {
-        AND: [
-          { company_id: user.company_id },
-          { sub_company_id: parseInt(selectedSubCompanyId) },
-          { role_name: user.role_name },
-          { access: true },
-        ],
-      },
-    });
+    let where = {
+      AND: [
+        { company_id: user.company_id },
+        { sub_company_id: user.sub_company_id },
+        { role_name: user.role_name },
+        { access: true },
+      ],
+    };
 
-    const forSystem = await Prisma.sys_roleprograms.findMany({
-      where: {
-        AND: [
-          { company_id: user.company_id },
-          { sub_company_id: user.sub_company_id },
-          { role_name: user.role_name },
-          { access: true },
-        ],
-      },
+    const sys_roleProgram = await Prisma.sys_roleprograms.findMany({
+      where,
     });
 
     let programs = [];
 
-    if (user.sub_company_id != parseInt(selectedSubCompanyId)) {
-      for (let i = 0; i < forSystem.length; i++) {
-        const item = forSystem[i];
-        const program = await Prisma.sys_programs.findUnique({
-          where: {
-            company_id_sub_company_id_program_id: {
-              company_id: item.company_id,
-              sub_company_id: item.sub_company_id,
-              program_id: item.program_id,
-            },
-            program_name: {
-              in: [
-                "Create roles",
-                "Create Users",
-                "Create Sub Company",
-                "Assign Programs",
-              ],
-            },
+    for (let i = 0; i < sys_roleProgram.length; i++) {
+      const item = sys_roleProgram[i];
+      const program = await Prisma.sys_programs.findUnique({
+        where: {
+          company_id_sub_company_id_program_id: {
+            company_id: item.company_id,
+            sub_company_id: item.sub_company_id,
+            program_id: item.program_id,
           },
-        });
-        programs.push(program);
-      }
-    } else {
-      for (let i = 0; i < sys_roleProgram.length; i++) {
-        const item = sys_roleProgram[i];
-        const program = await Prisma.sys_programs.findUnique({
-          where: {
-            company_id_sub_company_id_program_id: {
-              company_id: item.company_id,
-              sub_company_id: item.sub_company_id,
-              program_id: item.program_id,
-            },
-          },
-        });
-        programs.push(program);
-      }
+        },
+      });
+      programs.push(program);
     }
 
     res.status(200).json({
       res: programs,
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
 
 export const getCompanyRoleProgram = async (req, res, next) => {
   try {
-    const { subCompanyId } = req.query;
+    const { page, role } = req.query;
     const { user } = req.body;
 
-    if (!subCompanyId) {
-      return next(createHttpError.BadRequest("No subcompany id found"));
+    let pageNo = 1;
+    let take = 12;
+
+    if (page > 1) {
+      pageNo = page;
     }
 
-    let originalData = await Prisma.sys_roleprograms.findMany({
-      where: {
-        company_id: user.company_id,
-        sub_company_id: parseInt(subCompanyId),
-        role_name: {
-          not: {
-            equals: "admin",
-          },
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (role != "" && role != "All") {
+      where.role_name = role;
+    } else {
+      where.role_name = {
+        not: {
+          equals: "admin",
         },
-      },
+      };
+    }
+
+    let totalCount = await Prisma.sys_roleprograms.count({
+      where,
+    });
+
+    let originalData = await Prisma.sys_roleprograms.findMany({
+      where,
+      skip: (pageNo - 1) * take,
+      take: take,
       include: { sys_programs: true },
     });
 
@@ -114,6 +98,7 @@ export const getCompanyRoleProgram = async (req, res, next) => {
     res.status(200).json({
       res: {
         rolePrograms,
+        totalCount,
       },
     });
   } catch (err) {

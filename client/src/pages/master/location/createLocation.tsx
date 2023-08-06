@@ -14,6 +14,7 @@ const CreateLocationPage = () => {
 
   const onSubmit = async (data: locationFormValues) => {
     await createLocationMutation.mutateAsync(data);
+    if (createLocationMutation.isError) return;
     navigate("/app/master/locations");
   };
 

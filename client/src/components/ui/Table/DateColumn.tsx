@@ -11,7 +11,7 @@ const DateColumn: FC<Props> = ({ date }) => {
     <div>
       {date ? (
         <p className="text-[14px]">
-          {ds.getDate()} / {ds.getMonth()} / {ds.getFullYear()}
+          {ds.getDate()} / {ds.getMonth() + 1} / {ds.getFullYear()}
         </p>
       ) : (
         <p className="text-[14px] text-red-500">Not Acknowledge</p>

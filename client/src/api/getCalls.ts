@@ -1,20 +1,26 @@
 import client from "./client";
 import {
   Category,
+  CategoryWithTotalCount,
   Company,
   CreatedUser,
   Location,
+  LocationWithTotalCount,
   Product,
   ProductWithSupplier,
+  ProductWithTotalCount,
   Program,
   PurchaseOrder,
   PurchaseOrderWithDetails,
+  PurchaseOrderWithTotalCount,
   Role,
   StockTransfer,
   StockTransferWithDetails,
+  StockTransferWithTotalCount,
   Store,
   SubCompany,
   Supplier,
+  SupplierWithTotalCount,
 } from "@@types/system";
 import { toast } from "react-hot-toast";
 import { catchAsyncError } from "./catchError";
@@ -133,12 +139,13 @@ export const fethchSubCompanies = async (
 };
 
 export const fethchRolePrograms = async (
-  subCompanyId: number,
+  role: any,
+  page: any,
   token: string
 ): Promise<any | undefined> => {
   try {
     const { data } = await client(
-      `/system/program/role?subCompanyId=${subCompanyId}`,
+      `/system/program/role?page=${page}&role=${role}`,
       {
         headers: {
           Authorization: "Bearer " + token,
@@ -154,16 +161,32 @@ export const fethchRolePrograms = async (
 };
 
 export const fetchCategories = async (
+  searchText: string,
+  count: number,
+  page: number,
   token: string
-): Promise<Category[] | undefined> => {
+): Promise<CategoryWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/master/department`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { data } = await client(
+      `/master/department?searchText=${searchText}&count=${count}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const departments: Category[] = res?.departments;
+
+    const d: CategoryWithTotalCount = {
+      category: departments,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
@@ -192,16 +215,32 @@ export const fetchSingleCategory = async (
 };
 
 export const fetchSuppliers = async (
+  searchText: string,
+  count: number,
+  page: number,
   token: string
-): Promise<Supplier[] | undefined> => {
+): Promise<SupplierWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/master/supplier`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { data } = await client(
+      `/master/supplier?searchText=${searchText}&count=${count}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const suppliers: Supplier[] = res?.suppliers;
+
+    const d: SupplierWithTotalCount = {
+      supplier: suppliers,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
@@ -230,16 +269,33 @@ export const fetchSingleSupplier = async (
 };
 
 export const fetchLocations = async (
+  searchText: string,
+  count: number,
+  page: number,
   token: string
-): Promise<Location[] | undefined> => {
+): Promise<LocationWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/master/location/`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { data } = await client(
+      `/master/location?searchText=${searchText}&count=${count}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const locations: Location[] = res?.locations;
+
+    const d: LocationWithTotalCount = {
+      location: locations,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
@@ -268,19 +324,38 @@ export const fetchSingleLocation = async (
 };
 
 export const fetchProducts = async (
+  searchText: string,
+  departmentCode: string,
+  count: number,
+  page: number,
   token: string
-): Promise<Product[] | undefined> => {
+): Promise<ProductWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/master/product`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { data } = await client(
+      `/master/product?searchText=${searchText}&count=${count}&departmentCode=${departmentCode}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const products: Product[] = res?.products;
+
+    const d: ProductWithTotalCount = {
+      product: products,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -303,23 +378,44 @@ export const fetchSingleProduct = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
 export const fetchPurchaseOrders = async (
+  filterValue: any,
+  page: any,
   token: string
-): Promise<PurchaseOrder[] | undefined> => {
+): Promise<PurchaseOrderWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/transaction/purchaseOrder`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { searchText, fullFillStatus, paidStatus, fromDate, toDate } =
+      filterValue;
+
+    const { data } = await client(
+      `/transaction/purchaseOrder?searchText=${searchText}&fullFillStatus=${fullFillStatus}&paidStatus=${paidStatus}&fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const purchaseOrders: PurchaseOrder[] = res?.purchaseOrders;
+
+    const d: PurchaseOrderWithTotalCount = {
+      purchaseOrder: purchaseOrders,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -341,23 +437,41 @@ export const fetchSinglePurchaseOrder = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
 export const fetchStockTransfers = async (
+  searchText: string,
+  page: any,
   token: string
-): Promise<StockTransfer[] | undefined> => {
+): Promise<StockTransferWithTotalCount | undefined> => {
   try {
-    const { data } = await client(`/transaction/stockTransfer`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const { data } = await client(
+      `/transaction/stockTransfer?searchText=${searchText}&page=${page}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+
     const res = data?.res;
-    return res;
+    const total = res?.totalCount;
+    const stockTransfers: StockTransfer[] = res?.transfers;
+
+    const d: StockTransferWithTotalCount = {
+      stockTransfer: stockTransfers,
+      totalCount: {
+        totalCount: total,
+      },
+    };
+
+    return d;
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -381,6 +495,7 @@ export const fetchSingleStockTransfer = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };
 
@@ -404,5 +519,6 @@ export const fetchProductQtyFromStore = async (
   } catch (err) {
     const message = catchAsyncError(err);
     toast.error(message.message);
+    throw message.message;
   }
 };

@@ -13,7 +13,6 @@ interface Props {
   quantites: any;
   unitPrices: any;
   setUnitPrices: any;
-  freight?: number;
 }
 
 const DetailsColumn: FC<Props> = ({
@@ -24,7 +23,6 @@ const DetailsColumn: FC<Props> = ({
   setUnitPrices,
   quantites,
   unitPrices,
-  freight,
 }) => {
   const { deletePurchaseOrderProductMutation } = useCreateMution();
 
@@ -85,12 +83,8 @@ const DetailsColumn: FC<Props> = ({
       }
     }
 
-    if (freight) {
-      setSubTotal(sub + freight);
-    } else {
-      setSubTotal(sub);
-    }
-  }, [unitPrices, quantites, freight]);
+    setSubTotal(sub);
+  }, [unitPrices, quantites]);
 
   return (
     <div className="border rounded-md p-5 mt-5">

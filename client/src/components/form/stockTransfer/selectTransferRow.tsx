@@ -1,15 +1,14 @@
-import { Category, Product } from "@@types/system";
 import { fetchProductQtyFromStore } from "@api/getCalls";
 import { useAuthContext } from "@context/AuthContext";
 import { TransferDetails } from "@pages/transaction/stockTransfer/createTransfer";
 import { FC, useEffect, useState } from "react";
 
 import { IoCloseSharp } from "react-icons/io5";
+import SelectDepartment from "@components/input/SelectDepartment";
+import SelectProductByDep from "@components/input/SelectProductByDep";
 
 interface Props {
   index: number;
-  categories: Category[];
-  products: Product[];
   handleInputChange(e: any, index: number): void;
   removeRow(index: number): void;
   transferDetails: TransferDetails[];
@@ -19,25 +18,14 @@ interface Props {
 
 const SelectTransferRow: FC<Props> = ({
   transferDetails,
-  categories,
-  products,
   index,
   handleInputChange,
   removeRow,
   fromLocation,
   setStoreQtyLess,
 }) => {
-  const [filterProducts, setFilterProduct] = useState<Product[]>();
-
   const [errorMsg, setErrorMsg] = useState("");
   const { user } = useAuthContext();
-
-  useEffect(() => {
-    const items = products.filter(
-      (res) => res.department_code === transferDetails[index].departmentCode
-    );
-    setFilterProduct(items);
-  }, [transferDetails]);
 
   useEffect(() => {
     if (transferDetails[index].quantity) {
@@ -59,6 +47,10 @@ const SelectTransferRow: FC<Props> = ({
         user.access_token
       );
 
+      if (storeQty === null) {
+        setErrorMsg(`There is no qty in store`);
+      }
+
       if (storeQty) {
         if (storeQty.qty_instock < transferDetails[index].quantity) {
           setErrorMsg(
@@ -76,32 +68,24 @@ const SelectTransferRow: FC<Props> = ({
   return (
     <div className="grid  items-start  grid-cols-12 gap-x-3 px-10 py-2 border-b">
       <div className="col-span-1">{index + 1}</div>
-      <select
-        name="departmentCode"
-        onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2  outline-none border text-[14px]  rounded-md px-2 py-1 w-28"
-      >
-        <option>Select</option>
-        {categories.map(
-          (item, i) =>
-            !item.closed_flag && (
-              <option value={item.department_code} key={i}>
-                {item.department_code}
-              </option>
-            )
-        )}
-      </select>
-      <select
-        name="productCode"
-        onChange={(e) => handleInputChange(e, index)}
-        className="col-span-2  outline-none border text-[14px]   rounded-md px-2 py-1 md:w-28 2xl:w-36"
-      >
-        <option>Select</option>
-        {filterProducts?.map(
-          (item, i) =>
-            !item.closed_flag && <option key={i}>{item.product_code}</option>
-        )}
-      </select>
+
+      <div className="col-span-2">
+        <SelectDepartment
+          index={index}
+          w={"w-full"}
+          handleInputChange={handleInputChange}
+        />
+      </div>
+
+      <div className="col-span-2">
+        <SelectProductByDep
+          departmentCode={transferDetails[index].departmentCode}
+          index={index}
+          w={"w-full"}
+          handleInputChange={handleInputChange}
+        />
+      </div>
+
       <div className="col-span-2 text-[13px]">
         {transferDetails[index].description}
       </div>

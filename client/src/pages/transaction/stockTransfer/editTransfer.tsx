@@ -32,7 +32,11 @@ const EditTransferPage: FC<Props> = ({}) => {
           Acknowledge Transfer
         </h2>
       </div>
-      <DisplayTransferData data={data} />
+      <DisplayTransferData
+        toLocation={toLocation}
+        fromLocation={fromLocation}
+        data={data}
+      />
     </div>
   );
 };

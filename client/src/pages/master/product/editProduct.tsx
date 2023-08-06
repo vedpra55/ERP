@@ -32,9 +32,12 @@ const EditProductPage = () => {
   const onSubmit = async (values: productFormValues) => {
     const item = {
       ...values,
+      departmentCode: departmentCode,
       selectedSuppliers,
       oldSuppliers: data?.suppliers,
     };
+
+    console.log(item);
 
     await updateProductMutation.mutateAsync(item);
     navigate("/app/master/products");
@@ -65,7 +68,6 @@ const EditProductPage = () => {
         handleSubmitForm={onSubmit}
       />
       <SelectSuppliers
-        suppliers={suppliers}
         selectedSuppliers={selectedSuppliers}
         setSelectedSuppliers={setSelectedSuppliers}
       />

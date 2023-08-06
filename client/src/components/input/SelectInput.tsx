@@ -42,7 +42,7 @@ const SelectInput: FC<Props> = ({
       {errMsg && (
         <p className=" text-[14px] text-red-400 tracking-normal">{errMsg}</p>
       )}
-      <label className="text-[14px] tracking-wider ">{label}</label>
+      <label className="text-[14px] tracking-wider font-medium ">{label}</label>
 
       <select
         onChange={(e) => setVal(e.target.value)}
@@ -95,7 +95,7 @@ export const SelecteInputNormal: FC<Props2> = ({
       {errMsg && (
         <p className=" text-[14px] text-red-400 tracking-normal">{errMsg}</p>
       )}
-      <label className="text-[14px] tracking-wider ">{label}</label>
+      <label className="text-[14px] tracking-wider font-medium ">{label}</label>
       <select
         name={name}
         onChange={(e) => handleChange(e)}

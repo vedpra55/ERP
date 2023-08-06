@@ -100,9 +100,17 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchRolePrograms = () => {
-    return useQuery(["role-programs"], {
-      queryFn: () => fethchRolePrograms(user.subCompanyId, user.access_token),
+  const useFetchRolePrograms = (role?: any, pageNo?: any) => {
+    const query = ["role-programs"];
+
+    if (pageNo) {
+      query.push(pageNo);
+    }
+
+    if (role) query.push(role);
+
+    return useQuery(query, {
+      queryFn: () => fethchRolePrograms(role, pageNo, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -110,9 +118,19 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchCategories = () => {
-    return useQuery(["categories"], {
-      queryFn: () => fetchCategories(user.access_token),
+  const useFetchCategories = (searchText?: string, count?: any, page?: any) => {
+    let key = searchText ? ["categories", searchText] : ["categories"];
+    if (count) {
+      key.push(count);
+    }
+
+    if (page) {
+      key.push(page);
+    }
+
+    return useQuery(key, {
+      queryFn: () =>
+        fetchCategories(searchText || "", count, page, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -130,9 +148,19 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchLocations = () => {
-    return useQuery(["locations"], {
-      queryFn: () => fetchLocations(user.access_token),
+  const useFetchLocations = (searchText?: string, count?: any, page?: any) => {
+    let key = searchText ? ["locations", searchText] : ["locations"];
+    if (count) {
+      key.push(count);
+    }
+
+    if (page) {
+      key.push(page);
+    }
+
+    return useQuery(key, {
+      queryFn: () =>
+        fetchLocations(searchText || "", count, page, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -150,9 +178,21 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchSuppliers = () => {
-    return useQuery(["suppliers"], {
-      queryFn: () => fetchSuppliers(user.access_token),
+  const useFetchSuppliers = (searchText?: string, count?: any, page?: any) => {
+    let key = searchText ? ["suppliers", searchText] : ["suppliers"];
+    if (count) {
+      key.push(count);
+    }
+
+    if (page) {
+      key.push(page);
+    }
+
+    console.log(page);
+
+    return useQuery(key, {
+      queryFn: () =>
+        fetchSuppliers(searchText || "", count, page, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -170,9 +210,33 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchProducts = () => {
-    return useQuery(["products"], {
-      queryFn: () => fetchProducts(user.access_token),
+  const useFetchProducts = (
+    searchText?: string,
+    departmentCode?: string,
+    count?: any,
+    page?: any
+  ) => {
+    let key = searchText ? ["products", searchText] : ["products"];
+    if (count) {
+      key.push(count);
+    }
+    if (departmentCode) {
+      key.push(departmentCode);
+    }
+
+    if (page) {
+      key.push(page);
+    }
+
+    return useQuery(key, {
+      queryFn: () =>
+        fetchProducts(
+          searchText || "",
+          departmentCode || "",
+          count,
+          page,
+          user.access_token
+        ),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -194,9 +258,15 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchPurchaseOrders = () => {
-    return useQuery(["purchase-orders"], {
-      queryFn: () => fetchPurchaseOrders(user.access_token),
+  const useFetchPurchaseOrders = (filterValue?: any, page?: any) => {
+    let query = ["purchase-orders", filterValue];
+
+    if (page) {
+      query.push(page);
+    }
+
+    return useQuery(query, {
+      queryFn: () => fetchPurchaseOrders(filterValue, page, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);
@@ -214,9 +284,16 @@ const useApiServices = () => {
     });
   };
 
-  const useFetchStockTransfers = () => {
-    return useQuery(["stock-transfers"], {
-      queryFn: () => fetchStockTransfers(user.access_token),
+  const useFetchStockTransfers = (searchText?: string, page?: any) => {
+    const query = ["stock-transfers", searchText];
+
+    if (page) {
+      query.push(page);
+    }
+
+    return useQuery(query, {
+      queryFn: () =>
+        fetchStockTransfers(searchText || "", page, user.access_token),
       onError(err) {
         const message = catchAsyncError(err);
         toast.error(message.message);

@@ -88,16 +88,124 @@ export const getAllProducts = async (req, res, next) => {
   try {
     const { user } = req.body;
 
-    const products = await Prisma.inv_products.findMany({
+    const { searchText, departmentCode, count, page } = req.query;
+
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    let depWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText) {
+      depWhere.department_name = {
+        contains: searchText,
+        mode: "insensitive",
+      };
+    }
+
+    const deps = await Prisma.inv_department.findMany({
+      where: {
+        ...depWhere,
+      },
+      select: {
+        department_code: true,
+      },
+    });
+
+    const codes = deps.map((item) => item.department_code);
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { product_code: { contains: searchText, mode: "insensitive" } },
+            {
+              product_description: {
+                contains: searchText,
+                mode: "insensitive",
+              },
+            },
+            { department_code: { in: codes } },
+          ],
+        },
+      ];
+    }
+
+    if (departmentCode) {
+      where.department_code = departmentCode;
+    }
+
+    let take = 10;
+    if (count > 0) {
+      take = parseInt(count);
+    }
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    const originalData = await Prisma.inv_products.findMany({
+      where,
+      orderBy: {
+        created_on: "desc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+    });
+
+    let departmentCodes = originalData.map((item) => {
+      return [item.department_code];
+    });
+
+    const flattenedDepartmentCodes = departmentCodes.flat();
+
+    const totalCount = await Prisma.inv_products.count({
+      where: {
+        ...where,
+      },
+    });
+
+    const departmentNames = await Prisma.inv_department.findMany({
       where: {
         company_id: user.company_id,
         sub_company_id: user.sub_company_id,
+        department_code: {
+          in: flattenedDepartmentCodes,
+        },
       },
     });
+
+    const products = originalData.map((item, i) => {
+      return {
+        department_name: departmentNames.map((i) => {
+          if (i.department_code === item.department_code)
+            return i.department_name;
+        }),
+        product_code: item.product_code,
+        product_description: item.product_description,
+        closed_flag: item.closed_flag,
+        qty_instock: item.qty_instock,
+        qty_backorder: item.qty_backorder,
+        qty_purchase: item.qty_purchase,
+        cost_price: item.cost_price,
+        selling_price: item.selling_price,
+        department_code: item.department_code,
+      };
+    });
+
     res.status(200).json({
-      res: products,
+      res: {
+        products,
+        totalCount,
+      },
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

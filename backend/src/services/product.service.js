@@ -17,19 +17,29 @@ export const calulatePurhcaseOrderNumbers = (
 ) => {
   console.log(costRate, freight, supplierCostRate, total, product, "service");
 
-  const supplierCostValue = (supplierCostRate / 100) * total;
-
   const unitPrice = parseFloat(product.cost_fc);
   const qty = parseInt(product.qty_ordered);
 
-  const productTotal = unitPrice * qty;
+  const productValue = unitPrice * qty;
 
-  const nonVendorCostWeightage = (productTotal / total) * supplierCostValue;
+  let freightValue = 0;
+  if (freight) {
+    freightValue = (parseFloat(productValue) / subTotal) * freight;
+  }
 
-  let newProductTotal = productTotal + freight + nonVendorCostWeightage;
+  let supplierCostValue = 0;
+  if (supplierCostRate) {
+    supplierCostValue = (supplierCostRate / 100) * total;
+  }
 
-  let costFc = newProductTotal / qty;
-  let costLocal = costFc * costRate;
+  const nonVendorCostWeightage =
+    (parseFloat(productValue) / total) * parseFloat(supplierCostValue);
+
+  const itemValue = unitPrice * qty + (nonVendorCostWeightage + freightValue);
+
+  const costFc = itemValue / qty;
+
+  const costLocal = costFc * costRate;
 
   return {
     costFc,
@@ -43,11 +53,17 @@ export const calulateAvarageNumber = (
   newCostLocal,
   newQty
 ) => {
-  const qty_received = parseInt(existingQty);
+  console.log(existingQty, costLocal, newCostLocal, newQty, "avarage");
+
+  const qty_received = existingQty;
   const productTotal = qty_received * costLocal;
   const newValue = newQty * newCostLocal;
   const totalQty = qty_received + newQty;
-  const averageCost = (productTotal + newValue) / totalQty;
+
+  let averageCost = (productTotal + newValue) / totalQty;
+
+  if (!averageCost) averageCost = 0;
+
   return {
     averageCost,
   };

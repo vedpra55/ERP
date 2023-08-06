@@ -54,68 +54,76 @@ export const purchaseOrderPdf = async (req, res, next) => {
         html {
           -webkit-print-color-adjust: exact;
         }
-          body,
-          h1,
-          h2,
-          h3,
-          h4,
-          p {
-            padding: 0;
-            margin: 0;
-     
-          }
-          .mainContainer {
-          
-            margin-left: 50px;
-            margin-right: 50px;
-          }
-          .infoContainer {
-            margin-top: 40px;
-            margin-bottom: 20px;
-            display: flex;
-    
-            justify-content: space-between;
-          }
-          .supplierInfo {
-            display: flex;
-            flex-direction: column;
-            row-gap: 2px;
-            margin-top: 10px;
-            border: 1px solid black;
-            padding: 10px;
-          }
-          .supplierContact {
-            margin-top: 20px;
-          }
-          .shipToInfo {
-            display: flex;
-            flex-direction: column;
-            row-gap: 2px;
-            margin-top: 10px;
-            border: 1px solid black;
-            padding: 10px;
-          }
-    
-          .grid-container {
-            display: grid;
-            align-content: center;
-            grid-template-columns: 1fr 1fr 1fr 3fr 1fr 1fr 1fr;
-          }
-    
-          .grid-item {
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        p {
+          padding: 0;
+          margin: 0;
+        }
+        .mainContainer {
+          margin-left: 25px;
+          margin-right: 25px;
+          margin-bottom: 100px;
+        }
+        .infoContainer {
+          margin-top: 40px;
+          margin-bottom: 20px;
+          display: flex;
+  
+          justify-content: space-between;
+        }
+        .supplierInfo {
+          display: flex;
+          flex-direction: column;
+          row-gap: 2px;
+          margin-top: 10px;
+          border: 1px solid black;
+          padding: 10px;
+        }
+        .supplierContact {
+          margin-top: 20px;
+        }
+        .shipToInfo {
+          display: flex;
+          flex-direction: column;
+          row-gap: 2px;
+          margin-top: 10px;
+          border: 1px solid black;
+          padding: 10px;
+        }
+  
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+  
+        th {
+          font-size: 12px;
+          padding: 8px;
+          text-align: left;
+          border: 1px solid black;
+          background-color: rgba(128, 128, 128, 0.299);
+        }
+  
+        th,
+        td {
+          font-size: 12px;
+          padding: 8px;
+          text-align: left;
+          border: 1px solid black;
+        }
+  
+        .hideBorder {
+          border: 0px solid black;
+        }
 
-            font-size: 12px;
-            padding: 10px;
-            border: 1px solid;
-          }
-    
-          .smallest {
-            grid-column: 1;
-          }
-    
-          .largest {
-            grid-column: 4;
-          }
+        .alignRight {
+          text-align: right;
+        }
+
         </style>
       </head>
       <body>
@@ -167,48 +175,53 @@ export const purchaseOrderPdf = async (req, res, next) => {
               </div>
             </section>
           </section>
-          <div class="grid-container">
-            <div style="background-color: #f2f2f2" class="grid-item smallest">
-              Srl
-            </div>
-            <div style="background-color: #f2f2f2" class="grid-item">
-              Department
-            </div>
-            <div style="background-color: #f2f2f2" class="grid-item">Product</div>
-            <div style="background-color: #f2f2f2" class="grid-item largest">
-              Description
-            </div>
-            <div style="background-color: #f2f2f2" class="grid-item">
-              Unit Price
-            </div>
-            <div style="background-color: #f2f2f2" class="grid-item">Quantity</div>
-            <div style="background-color: #f2f2f2" class="grid-item">Value</div>
-          </div>
-    
+
+          <table style="margin-top: 20px">
+          <thead>
+            <tr>
+              <th style="width: 10%">Srl</th>
+              <th style="width: 10%">Department</th>
+              <th style="width: 30%">Product</th>
+              <th style="width: 10%">Description</th>
+              <th style="width: 20%">Unit Price</th>
+              <th style="width: 10%">Quantity</th>
+              <th style="width: 15%">Value</th>
+            </tr>
+          </thead>
+
           ${purchaseOrderDetails
-            ?.map(
+            .map(
               (item, i) =>
-                `<div class="grid-container">
-            <div class="grid-item smallest">${item.serial_no}</div>
-            <div class="grid-item">${item.department_code}</div>
-            <div class="grid-item">${item.product_code}</div>
-            <div class="grid-item largest">${
-              products[i].product_description
-            }</div>
-            <div class="grid-item">${item.cost_fc}</div>
-            <div class="grid-item">${item.qty_ordered}</div>
-            <div class="grid-item">${
-              parseInt(item.cost_fc) * parseInt(item.qty_ordered)
-            }
-            </div>
-          </div>`
+                `
+            <tbody>
+            <tr>
+              <td>${item.serial_no}</td>
+              <td>${item.department_code}</td>
+              <td>${item.product_code}</td>
+              <td>${products[i].product_description}</td>
+              <td class="alignRight">${item.cost_fc}</td>
+              <td class="alignRight">${item.qty_ordered}</td>
+              <td class="alignRight">${
+                parseInt(item.cost_fc) * parseInt(item.qty_ordered)
+              }</td>
+            </tr>
+          </tbody>
+            `
             )
-            .join("")}
-    
-          <div style="display: flex; justify-content: flex-end;">
-            <p style="border: 1px solid; padding: 10px">Sub Total</p>
-            <p style="border: 1px solid; padding: 10px; font-size:14px;">${subTotal}</p>
-          </div>
+            .join(" ")}
+
+          <tbody>
+            <tr>
+              <td class="hideBorder"></td>
+              <td class="hideBorder"></td>
+              <td class="hideBorder"></td>
+              <td class="hideBorder"></td>
+              <td class="hideBorder"></td>
+              <td style="font-weight :bold">Sub Total</td>
+              <td class="alignRight">${subTotal}</td>
+            </tr>
+          </tbody>
+        </table>
         </main>
       </body>
     </html>

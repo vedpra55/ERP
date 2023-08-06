@@ -1,12 +1,17 @@
 import useApiServices from "@api/query";
+import Pagination from "@components/ui/Pagination";
 import Table, { TableColumn } from "@components/ui/Table/Table";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const MainPage = () => {
   const { useFetchStockTransfers } = useApiServices();
-  const { data } = useFetchStockTransfers();
+  const [searchText, setSeachText] = useState("");
+  const [value, setValue] = useState("");
 
-  if (!data) return;
+  const [pageNo, setPageNo] = useState(0);
+
+  const { data } = useFetchStockTransfers(value, pageNo);
 
   const transferColumn: TableColumn[] = [
     {
@@ -40,8 +45,8 @@ const MainPage = () => {
       header: "Action",
       accessor: "action",
       field: "transfer_no",
-      field2: "from_location",
-      field3: "to_location",
+      field2: "from_location_code",
+      field3: "to_location_code",
       colSpan: "col-span-1",
     },
   ];
@@ -52,7 +57,41 @@ const MainPage = () => {
         Create Stock Transfer
       </Link>
 
-      <Table columns={transferColumn} data={data} />
+      <div>
+        <div className="mt-10 flex gap-x-5 items-center">
+          <input
+            value={searchText}
+            onChange={(e) => setSeachText(e.target.value.trim())}
+            placeholder="Search locations or transfer#"
+            className="myInput text-[14px]"
+          />
+          <button
+            onClick={() => {
+              setPageNo(1);
+              setValue(searchText);
+            }}
+            className=" text-[14px] bg-gray-100 py-2 px-2 rounded-md hover:bg-gray-400"
+          >
+            Submit
+          </button>
+        </div>
+        <button
+          onClick={() => {
+            setValue("");
+            setSeachText("");
+          }}
+          className="text-gray-800 mt-2 px-5"
+        >
+          Reset
+        </button>
+      </div>
+
+      {data && <Table columns={transferColumn} data={data.stockTransfer} />}
+
+      <Pagination
+        setPageNo={setPageNo}
+        totalItem={data?.totalCount.totalCount}
+      />
     </div>
   );
 };

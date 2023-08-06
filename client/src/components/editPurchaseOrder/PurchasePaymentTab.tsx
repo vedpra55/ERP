@@ -108,14 +108,14 @@ const PurchasePayment: FC<Props> = ({
           <div className="flex font-medium text-[14px] 2xl:text-lg items-center gap-x-10">
             <p className="w-28">Order Date</p>
             <p>
-              {orderDate.getDate()} / {orderDate.getMonth()} /{" "}
+              {orderDate.getDate()} / {orderDate.getMonth() + 1} /{" "}
               {orderDate.getFullYear()}
             </p>
           </div>
           <div className="flex mt-2 font-medium text-[14px] 2xl:text-lg items-center gap-x-10">
             <p className="w-28">Due Date</p>
             <p>
-              {dueDate.getDate()} / {dueDate.getMonth()} /{" "}
+              {dueDate.getDate()} / {dueDate.getMonth() + 1} /{" "}
               {dueDate.getFullYear()}
             </p>
           </div>

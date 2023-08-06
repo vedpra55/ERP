@@ -23,6 +23,7 @@ const SelectSubCompanyModal: FC<Props> = ({
     <Modal isOpen={isOpen} onClose={() => setOpen(false)}>
       <h1 className="font-medium text-[14px] mb-6">Select Sub Company</h1>
       <SelecteInputNormal
+        extraValAccessor="sub_company_name"
         name="selectedSubCompany"
         label=""
         data={subCompanyList}

@@ -18,8 +18,8 @@ export type supplierFormValue = {
   address1: string;
   address2: string;
   email: string;
-  telephoneNo: number;
-  mobileNo: number;
+  telephoneNo: string;
+  mobileNo: string;
   country: string;
   fax: string;
   closedFlag?: boolean;
@@ -51,8 +51,8 @@ const SupplierForm: FC<Props> = ({
         fax: defaultValues?.fax,
         closedFlag: defaultValues?.closed_flag || undefined,
         country: defaultValues?.country,
-        telephoneNo: defaultValues?.telephone_no,
-        mobileNo: defaultValues?.mobile_no,
+        telephoneNo: defaultValues?.telephone_no.toString(),
+        mobileNo: defaultValues?.mobile_no.toString(),
       });
     }
   }, [defaultValues]);
@@ -101,14 +101,12 @@ const SupplierForm: FC<Props> = ({
         errorMsg={errors.country?.message}
       />
       <AppInput
-        type="number"
         name="telephoneNo"
         placeholder="Telephone No"
         register={register}
         errorMsg={errors.telephoneNo?.message}
       />
       <AppInput
-        type="number"
         name="mobileNo"
         placeholder="Mobile No"
         register={register}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        padding: 0;
+        margin: 0;
+      }
+      .mainContainer {
+        margin-left: 25px;
+        margin-right: 25px;
+        margin-bottom: 50px;
+      }
+      .infoContainer {
+        margin-top: 40px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .infoItem {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        width: 300px;
+        row-gap: 10px;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th {
+        padding: 8px;
+        font-size: 12px;
+        text-align: left;
+        border: 1px solid black; /* Border for the cells */
+      }
+
+      .darkHeading {
+        font-weight: bold;
+        background-color: rgba(128, 128, 128, 0.4);
+      }
+
+      .darkHeading2 {
+        font-weight: bold;
+        background-color: rgba(128, 128, 128, 0.2);
+      }
+
+      td {
+        font-size: 12px;
+        padding: 8px;
+        text-align: left;
+        border: 1px solid black; /* Border for the cells */
+      }
+
+      .alignRight {
+        text-align: right;
+      }
+
+      .hideBorder {
+        border: 0px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="mainContainer">
+      <section style="margin-top: 20px">
+        <h2 style="text-align: center">Tata Consultancy Service</h2>
+        <h4 style="text-align: center; margin-top: 10px">
+          Purchase Order Details
+        </h4>
+      </section>
+      <section class="infoContainer">
+        <section>
+          <div class="infoItem">
+            <p>Supplier: <span style="margin-left: 5px">ABC</span></p>
+            <p>
+              <span>ABC_Eelectronics</span>
+            </p>
+          </div>
+          <div class="infoItem">
+            <p>PO Date: <span style="margin-left: 10px">1 June 2023</span></p>
+            <p>
+              PO To Date: <span style="margin-left: 10px">5 June 2023</span>
+            </p>
+          </div>
+          <div class="infoItem">
+            <p>Status: <span style="margin-left: 10px">All</span></p>
+          </div>
+        </section>
+        <section>
+          <p style="font-weight: 600">Date : <span>12/06/2023</span></p>
+        </section>
+      </section>
+
+      <table>
+        <thead class="darkHeading">
+          <tr>
+            <th>Supplier</th>
+            <th colspan="2">Name</th>
+            <th>Order#</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Paid</th>
+            <th colspan="2">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data 1</td>
+            <td colspan="2">Data 2</td>
+            <td>Data 3</td>
+            <td>Data 4</td>
+            <td style="font-weight: 400" class="alignRight">60</td>
+            <td class="alignRight">10</td>
+            <td class="alignRight" colspan="2">50</td>
+          </tr>
+          <tr class="darkHeading2">
+            <td></td>
+            <td>Serial</td>
+            <td>Department</td>
+            <td>Product</td>
+            <td>Description</td>
+            <td>Unit Price</td>
+            <td>Qty</td>
+            <td>Value</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>1</td>
+            <td>001</td>
+            <td>PL-5</td>
+            <td>verd</td>
+            <td class="alignRight">10</td>
+            <td class="alignRight">5</td>
+            <td class="alignRight">50</td>
+          </tr>
+          <tr>
+            <td class="darkHeading2" style="text-align: center" colspan="7">
+              Total
+            </td>
+            <td class="alignRight">500</td>
+          </tr>
+        </tbody>
+        <tr>
+          <td colspan="7" class="darkHeading" style="text-align: center">
+            Report Total
+          </td>
+          <td class="alignRight">500</td>
+        </tr>
+      </table>
+    </main>
+  </body>
+</html>

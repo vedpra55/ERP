@@ -12,6 +12,7 @@ const CreateCategoryPage = () => {
 
   const onSubmit = async (data: departmentForm) => {
     await createCategoryMutation.mutateAsync(data);
+    if (createCategoryMutation.isError) return;
     navigate("/app/master/categories");
   };
 

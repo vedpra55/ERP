@@ -1,17 +1,20 @@
 import useApiServices from "@api/query";
+import Pagination from "@components/ui/Pagination";
 import Table, { TableColumn } from "@components/ui/Table/Table";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Main = () => {
   const { useFetchProducts } = useApiServices();
-  const { data } = useFetchProducts();
-
-  if (!data) return;
+  const [searchText, setSeachText] = useState("");
+  const [value, setValue] = useState("");
+  const [pageNo, setPageNo] = useState(1);
+  const { data } = useFetchProducts(value, "", null, pageNo);
 
   const productColumn: TableColumn[] = [
     {
       header: "Department Code",
-      accessor: "department_code",
+      accessor: "department_name",
       colSpan: "col-span-1",
     },
     {
@@ -69,7 +72,47 @@ const Main = () => {
         Create Product
       </Link>
 
-      <Table width="w-[120rem]" columns={productColumn} data={data} />
+      <div>
+        <div className="mt-10 flex gap-x-5 items-center">
+          <input
+            value={searchText}
+            onChange={(e) => setSeachText(e.target.value.trim())}
+            placeholder="Search department Code or Name"
+            className="myInput text-[14px]"
+          />
+          <button
+            onClick={() => {
+              setValue(searchText);
+              setPageNo(1);
+            }}
+            className=" text-[14px] bg-gray-100 py-2 px-2 rounded-md hover:bg-gray-400"
+          >
+            Submit
+          </button>
+        </div>
+        <button
+          onClick={() => {
+            setValue("");
+            setSeachText("");
+          }}
+          className="text-gray-800 mt-2 px-5"
+        >
+          Reset
+        </button>
+      </div>
+      <div className="mt-5 mb-5">Total : {data?.totalCount.totalCount}</div>
+      {data && (
+        <Table
+          noMargin
+          width="w-[120rem]"
+          columns={productColumn}
+          data={data.product}
+        />
+      )}
+      <Pagination
+        setPageNo={setPageNo}
+        totalItem={data?.totalCount.totalCount}
+      />
     </div>
   );
 };

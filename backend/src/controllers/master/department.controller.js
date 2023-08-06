@@ -21,7 +21,15 @@ export const createDepartment = async (req, res, next) => {
       });
 
       if (nameExist?.department_name === departmentName) {
-        next(createHttpError.BadRequest("Department name already exists"));
+        return next(
+          createHttpError.BadRequest("Department name already exists")
+        );
+      }
+
+      if (nameExist?.department_code === departmentCode) {
+        return next(
+          createHttpError.BadRequest("Department code already exists")
+        );
       }
 
       await Prisma.inv_department.create({
@@ -45,18 +53,59 @@ export const createDepartment = async (req, res, next) => {
 export const getAllDepartment = async (req, res, next) => {
   try {
     const { user } = req.body;
+    const { searchText, count, page } = req.query;
 
-    const departments = await Prisma.inv_department.findMany({
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { department_code: { contains: searchText, mode: "insensitive" } },
+            { department_name: { contains: searchText, mode: "insensitive" } },
+          ],
+        },
+      ];
+    }
+
+    let take = 10;
+    if (count > 0) {
+      take = parseInt(count);
+    }
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    const totalCount = await Prisma.inv_department.count({
       where: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
+        ...where,
       },
     });
 
+    const departments = await Prisma.inv_department.findMany({
+      where: {
+        ...where,
+      },
+      orderBy: {
+        created_on: "desc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+    });
+
     res.status(200).json({
-      res: departments,
+      res: {
+        departments,
+        totalCount,
+      },
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -115,6 +164,7 @@ export const updateDepartment = async (req, res, next) => {
       message: "Department Updated Successfully",
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

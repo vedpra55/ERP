@@ -214,17 +214,108 @@ export const getAllStockTransfer = async (req, res, next) => {
   try {
     const { user } = req.body;
 
-    const transfers = await Prisma.inv_transfer.findMany({
+    const { searchText, page } = req.query;
+
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    let locWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText) {
+      locWhere.location_name = {
+        contains: searchText,
+        mode: "insensitive",
+      };
+    }
+
+    const locations = await Prisma.inv_locations.findMany({
       where: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
+        ...locWhere,
       },
     });
 
+    const filterLocationCodes = locations.map((item) => item.location_code);
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { transfer_no: { contains: searchText, mode: "insensitive" } },
+            { from_location: { in: filterLocationCodes } },
+            { to_location: { in: filterLocationCodes } },
+          ],
+        },
+      ];
+    }
+
+    const take = 10;
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    const totalCount = await Prisma.inv_transfer.count({
+      where: {
+        ...where,
+      },
+    });
+
+    const originalData = await Prisma.inv_transfer.findMany({
+      where,
+      orderBy: {
+        created_on: "desc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+    });
+
+    let locationCodes = originalData.map((item) => {
+      return [item.to_location, item.from_location];
+    });
+
+    // Flatten the array of arrays to a single array
+    const flattenedLocationCodes = locationCodes.flat();
+
+    const locationName = await Prisma.inv_locations.findMany({
+      where: {
+        company_id: user.company_id,
+        sub_company_id: user.sub_company_id,
+        location_code: {
+          in: flattenedLocationCodes,
+        },
+      },
+    });
+
+    const transfers = originalData.map((item, i) => {
+      return {
+        transfer_no: item.transfer_no,
+        acknowledge_dt: item.acknowledge_dt,
+        to_location_code: item.to_location,
+        remarks: item.remarks,
+        from_location_code: item.from_location,
+        to_location: locationName.map((r) => {
+          if (r.location_code === item.to_location) return r.location_name;
+        }),
+        from_location: locationName.map((r) => {
+          if (r.location_code === item.from_location) return r.location_name;
+        }),
+      };
+    });
+
     res.status(200).json({
-      res: transfers,
+      res: {
+        transfers,
+        totalCount,
+      },
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -238,7 +329,7 @@ export const getSingleStockTransfer = async (req, res, next) => {
       next(createHttpError.BadRequest("All fields not found"));
     }
 
-    const transfer = await Prisma.inv_transfer.findUnique({
+    const originalData = await Prisma.inv_transfer.findUnique({
       where: {
         company_id_sub_company_id_from_location_to_location_transfer_no: {
           company_id: user.company_id,
@@ -249,6 +340,39 @@ export const getSingleStockTransfer = async (req, res, next) => {
         },
       },
     });
+
+    let locationCodes = [originalData.to_location, originalData.from_location];
+
+    // Flatten the array of arrays to a single array
+    const flattenedLocationCodes = locationCodes.flat();
+
+    const locationName = await Prisma.inv_locations.findMany({
+      where: {
+        company_id: user.company_id,
+        sub_company_id: user.sub_company_id,
+        location_code: {
+          in: flattenedLocationCodes,
+        },
+      },
+    });
+
+    const transfer = {
+      transfer_no: originalData.transfer_no,
+      acknowledge_dt: originalData.acknowledge_dt,
+      to_location_code: originalData.to_location,
+      from_location_code: originalData.from_location,
+      remarks: originalData.remarks,
+      acknowledge_dt: originalData.acknowledge_dt,
+      transfer_dt: originalData.transfer_dt,
+      to_location: locationName.map((r) => {
+        if (r.location_code === originalData.to_location)
+          return r.location_name;
+      }),
+      from_location: locationName.map((r) => {
+        if (r.location_code === originalData.from_location)
+          return r.location_name;
+      }),
+    };
 
     const details = await Prisma.inv_transfer_detail.findMany({
       where: {
@@ -276,7 +400,7 @@ export const acknowledgeStockTransfer = async (req, res, next) => {
     const { user, fromLocation, toLocation, transferNo } = req.body;
 
     if (!fromLocation || !toLocation || !transferNo) {
-      next(createHttpError.BadRequest("All fields not found"));
+      return next(createHttpError.BadRequest("All fields not found"));
     }
 
     await Prisma.inv_transfer.update({
@@ -299,6 +423,7 @@ export const acknowledgeStockTransfer = async (req, res, next) => {
       message: "Stock Acknowledge Successfully",
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

@@ -35,29 +35,31 @@ const Table: FC<TableProps> = ({
   noMargin,
 }) => {
   return (
-    <div
-      className={`${height ? height : "h-[30rem]"}  overflow-y-scroll ${
-        !noMargin && "mt-10"
-      }`}
-    >
-      <TableHeader columns={columns} width={width} />
-      {data.map((item, index) => (
-        <div
-          key={index}
-          className={`tableRow overflow-x-auto  ${
-            from === "select" && "cursor-pointer hover:bg-gray-50"
-          }  ${width} `}
-        >
-          {columns.map((column, ii) => {
-            return (
-              <div key={ii} className={`  ${column.colSpan}`}>
-                <TableCell index={index} column={column} item={item} />
-              </div>
-            );
-          })}
-        </div>
-      ))}
-    </div>
+    <>
+      <div
+        className={`${height ? height : "h-[30rem]"}  overflow-y-scroll ${
+          !noMargin && "mt-10"
+        }`}
+      >
+        <TableHeader columns={columns} width={width} />
+        {data.map((item, index) => (
+          <div
+            key={index}
+            className={`tableRow overflow-x-auto  ${
+              from === "select" && "cursor-pointer hover:bg-gray-50"
+            }  ${width} `}
+          >
+            {columns.map((column, ii) => {
+              return (
+                <div key={ii} className={`  ${column.colSpan}`}>
+                  <TableCell index={index} column={column} item={item} />
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 

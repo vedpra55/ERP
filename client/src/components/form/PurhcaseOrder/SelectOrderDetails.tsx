@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { OrderDetails } from "../PurchaseOrderForm";
-import useApiServices from "@api/query";
 import AppButton from "@components/ui/AppButton";
 import PurchaseOrderRow from "./PurchaseOrderRow";
+import { fetchSingleProduct } from "@api/getCalls";
+import { useAuthContext } from "@context/AuthContext";
 
 interface Props {
   orderDetailsRow: OrderDetails[];
@@ -15,11 +16,7 @@ const SelectOrderDetails: FC<Props> = ({
   setOrderDetailsRow,
   totalOrderValue,
 }) => {
-  const { useFetchProducts, useFetchCategories } = useApiServices();
-  const { data: categories } = useFetchCategories();
-  const { data: products } = useFetchProducts();
-
-  if (!products || !categories) return;
+  const { user } = useAuthContext();
 
   const handleInputChange = (e: any, index: number) => {
     const { value, name } = e.target;
@@ -39,10 +36,29 @@ const SelectOrderDetails: FC<Props> = ({
       list[index]["productCode"] = value;
       setOrderDetailsRow(list);
 
-      const product = products.filter((res) => res.product_code === value)[0];
-      const list2 = [...orderDetailsRow];
-      list2[index]["description"] = product.product_description;
-      setOrderDetailsRow(list2);
+      let productDescription = "";
+
+      fetchSingleProduct(
+        value,
+        orderDetailsRow[index].departmentCode,
+        user.access_token
+      )
+        .then((res) => {
+          if (res?.product) {
+            productDescription = res?.product.product_description;
+          }
+
+          const list2 = [...orderDetailsRow];
+          list2[index]["description"] = productDescription;
+          setOrderDetailsRow(list2);
+        })
+        .catch((err) => {
+          console.log(err);
+
+          const list2 = [...orderDetailsRow];
+          list2[index]["description"] = "";
+          setOrderDetailsRow(list2);
+        });
     }
 
     if (name === "unitPrice") {
@@ -95,8 +111,6 @@ const SelectOrderDetails: FC<Props> = ({
         <PurchaseOrderRow
           key={index}
           orderDetails={orderDetailsRow}
-          categories={categories}
-          products={products}
           index={index}
           handleInputChange={handleInputChange}
           removeRow={handleRemoveRow}
@@ -121,8 +135,8 @@ function Header() {
       <div className="col-span-2">Department</div>
       <div className="col-span-2">Product</div>
       <div className="col-span-2">Description</div>
-      <div className="col-span-1">Unit Price</div>
-      <div className="col-span-2">Quantity</div>
+      <div className="col-span-2">Unit Price</div>
+      <div className="col-span-1">Quantity</div>
       <div className="col-span-1">Value</div>
       <div className="col-span-1">Action</div>
     </div>

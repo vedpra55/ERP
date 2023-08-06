@@ -34,6 +34,7 @@ const EditCategoryPage = () => {
           </h2>
         </div>
         <AppButton
+          isLoading={updateCategoryMutation.isLoading}
           handleOnClick={() => {
             submitButtonRef?.current?.click();
           }}

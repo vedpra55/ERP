@@ -5,7 +5,7 @@ export const createLocation = async (req, res, next) => {
   const { locationCode, locationName, shortName, closedFlag, user } = req.body;
 
   if (!locationCode || !locationName || !shortName) {
-    next(createHttpError.BadRequest("Please fill all fields"));
+    return next(createHttpError.BadRequest("Please fill all fields"));
   }
 
   try {
@@ -21,9 +21,7 @@ export const createLocation = async (req, res, next) => {
       });
 
       if (locationCodeExits) {
-        return res.status(200).json({
-          errorMessage: "Location Code Exits",
-        });
+        return next(createHttpError.BadRequest("Location code already exits"));
       }
 
       await Prisma.inv_locations.create({
@@ -50,17 +48,57 @@ export const getAllLocations = async (req, res, next) => {
   try {
     const { user } = req.body;
 
-    const locations = await Prisma.inv_locations.findMany({
+    const { searchText, count, page } = req.query;
+
+    let where = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    if (searchText && searchText.trim() !== "") {
+      where.AND = [
+        {
+          OR: [
+            { location_code: { contains: searchText, mode: "insensitive" } },
+            { location_name: { contains: searchText, mode: "insensitive" } },
+          ],
+        },
+      ];
+    }
+
+    let take = 10;
+    if (count > 0) {
+      take = parseInt(count);
+    }
+
+    let pageNo = 1;
+    if (page > 1) {
+      pageNo = page;
+    }
+
+    const totalCount = await Prisma.inv_locations.count({
       where: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
+        ...where,
       },
     });
 
+    const locations = await Prisma.inv_locations.findMany({
+      where,
+      orderBy: {
+        location_name: "asc",
+      },
+      skip: (pageNo - 1) * take,
+      take: take,
+    });
+
     res.status(200).json({
-      res: locations,
+      res: {
+        locations,
+        totalCount,
+      },
     });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

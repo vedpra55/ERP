@@ -5,17 +5,17 @@ import { useForm } from "react-hook-form";
 import AppInput from "@components/input/AppInput";
 import CheckboxInput from "@components/input/CheckboxInput";
 import { productSchema } from "@utils/validator";
-import SelectInput from "@components/input/SelectInput";
+import SelectDepartment from "@components/input/SelectDepartment";
 
 interface Props {
   categories?: any;
   defaultValues?: Product;
   handleSubmitForm(data: productFormValues): void;
   submitButtonRef: React.RefObject<HTMLButtonElement>;
+  setSelectedDepartmentCode?: any;
 }
 
 export type productFormValues = {
-  departmentCode: string;
   productCode: string;
   productDescription: string;
   qtyInStock?: number;
@@ -30,7 +30,7 @@ const ProductForm: FC<Props> = ({
   defaultValues,
   handleSubmitForm,
   submitButtonRef,
-  categories,
+  setSelectedDepartmentCode,
 }) => {
   const {
     register,
@@ -46,7 +46,6 @@ const ProductForm: FC<Props> = ({
       reset({
         productCode: defaultValues.product_code,
         productDescription: defaultValues.product_description,
-        departmentCode: defaultValues.department_code,
         costPrice: defaultValues.cost_price,
         sellingPrice: defaultValues.selling_price,
         qtyBackOrder: defaultValues.qty_backorder,
@@ -64,15 +63,11 @@ const ProductForm: FC<Props> = ({
     >
       {!defaultValues && (
         <>
-          <SelectInput
-            accessor="department_code"
-            name="departmentCode"
-            label="Department Code"
-            extraValAccessor="department_name"
-            register={register}
-            closeCheck
-            data={categories}
-          />
+          <div className="col-span-4">
+            <SelectDepartment
+              setSelectedDepartmentCode={setSelectedDepartmentCode}
+            />
+          </div>
 
           <AppInput
             name="productCode"

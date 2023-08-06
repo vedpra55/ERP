@@ -20,7 +20,9 @@ const AppInput: FC<Props> = ({
       {errorMsg && (
         <p className=" text-[14px] text-red-400 tracking-normal">{errorMsg}</p>
       )}
-      <label className="text-[14px] tracking-wider ">{placeholder}</label>
+      <label className="text-[14px] tracking-wider font-medium ">
+        {placeholder}
+      </label>
       <input
         step={"any"}
         type={type || "text"}

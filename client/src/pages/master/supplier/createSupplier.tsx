@@ -13,6 +13,7 @@ const CreateSupplierPage = () => {
 
   const onSubmit = async (data: supplierFormValue) => {
     await createSupplierMutation.mutateAsync(data);
+    if (createSupplierMutation.isError) return;
     navigate("/app/master/suppliers");
   };
 
