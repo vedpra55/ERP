@@ -105,7 +105,7 @@ const SelectLocation: FC<Props> = ({
             }
           }
         }}
-        className={`${w ? w : "2xl:w-80"} outline-none`}
+        className={`${w ? w : "2xl:w-80"} text-[14px] outline-none`}
         options={
           locationData && locationData?.length > 0
             ? locationData

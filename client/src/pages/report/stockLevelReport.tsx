@@ -21,7 +21,7 @@ const StockLevelReport: FC<Props> = ({}) => {
   const [parameters, setParameters] = useState<StockLevelReportParameter>({
     departmentCode: [],
     locationCode: "All",
-    closed: "Yes",
+    closed: "All",
     status: {
       type: "Greater Than",
       value: 0,

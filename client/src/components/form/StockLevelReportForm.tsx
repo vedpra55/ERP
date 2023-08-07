@@ -1,7 +1,6 @@
 import { Location } from "@@types/system";
 import { fetchSingleCategory, fetchSingleLocation } from "@api/getCalls";
 import SelectDepartment from "@components/input/SelectDepartment";
-import { SelecteInputNormal } from "@components/input/SelectInput";
 import SelectLocation from "@components/input/SelectLocaton";
 import AppButton from "@components/ui/AppButton";
 import { useAuthContext } from "@context/AuthContext";
@@ -178,13 +177,19 @@ const StockLevelReportForm: FC<Props> = ({
               ))}
             </div>
           )}
-        <SelecteInputNormal
-          data={[{ name: "Yes" }, { name: "No" }, { name: "All" }]}
-          accessor="name"
-          handleChange={handleOnInputChange}
-          name="closed"
-          label="Closed"
-        />
+        <div className="flex col-span-4 flex-col gap-y-1  w-80  ">
+          <p className="text-[15px] tracking-wider font-medium">Closed</p>
+          <select
+            className="border rounded-md py-2 px-5 outline-none"
+            name="closed"
+            onChange={handleOnInputChange}
+          >
+            <option>All</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+
         <StatusSelection handleOnInputChange={handleOnInputChange} />
       </div>
       <AppButton

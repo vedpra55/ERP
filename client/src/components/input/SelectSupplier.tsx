@@ -105,7 +105,7 @@ const SelectSupplier: FC<Props> = ({
             }
           }
         }}
-        className={`${w ? w : "2xl:w-80"} outline-none`}
+        className={`${w ? w : "2xl:w-80"} text-[14px] outline-none`}
         options={
           supplierData && supplierData?.length > 0
             ? supplierData
