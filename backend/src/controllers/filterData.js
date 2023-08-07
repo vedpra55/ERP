@@ -1,4 +1,5 @@
 // inventoryService.js
+import createHttpError from "http-errors";
 import prisma from "../../prisma/index.js";
 
 export async function getSummaryData(filter, user) {
@@ -58,6 +59,10 @@ export async function getSummaryData(filter, user) {
 
     if (closed === "All") {
       filterData = data;
+    }
+
+    if (filterData?.length === 0) {
+      throw createHttpError.BadRequest("There is no data for the filters");
     }
 
     filterData.forEach((item) => {
