@@ -278,7 +278,7 @@ export const updateProduct = async (req, res, next) => {
       productDescription,
       costPrice,
       sellingPrice,
-
+      closedFlag,
       selectedSuppliers,
       oldSuppliers,
       user,
@@ -315,6 +315,7 @@ export const updateProduct = async (req, res, next) => {
           cost_price: parseFloat(costPrice),
           selling_price: parseFloat(sellingPrice),
           product_description: productDescription,
+          closed_flag: closedFlag,
         },
       });
 

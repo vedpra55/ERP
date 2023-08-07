@@ -42,13 +42,11 @@ const SelectDepartment: FC<Props> = ({
       );
 
       if (data?.res) {
-        let values = data.res.departments.map((item: any) => {
-          if (!item?.closed_flag) {
+        let values = data.res.departments
+          .filter((dep: any) => !dep.closed_flag)
+          .map((item: any) => {
             return { label: item.department_name, value: item.department_code };
-          } else {
-            return { value: "", label: "" };
-          }
-        });
+          });
 
         if (isAllValue) {
           values.push({ value: "All", label: "All" });
@@ -67,16 +65,14 @@ const SelectDepartment: FC<Props> = ({
 
   useEffect(() => {
     if (departments) {
-      let values = departments.category.map((item: any) => {
-        if (!item?.closed_flag) {
+      let values = departments.category
+        .filter((dep) => !dep.closed_flag)
+        .map((item) => {
           return {
             label: item.department_name + "-" + item.department_code,
             value: item.department_code,
           };
-        } else {
-          return { value: "", label: "" };
-        }
-      });
+        });
 
       if (isAllValue) {
         values.push({ value: "All", label: "All" });

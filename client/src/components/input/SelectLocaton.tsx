@@ -39,16 +39,14 @@ const SelectLocation: FC<Props> = ({
       );
 
       if (data?.res) {
-        const values = data.res.locations.map((item: any) => {
-          if (!item?.closed_flag) {
+        let values = data.res.locations
+          .filter((loc: any) => !loc.closed_flag)
+          .map((item: any) => {
             return {
-              label: item.location_name + "-" + item.location_code,
+              label: item.short_name + "-" + item.location_code,
               value: item.location_code,
             };
-          } else {
-            return { value: "", label: "" };
-          }
-        });
+          });
 
         if (isAllValue) {
           values.push({ value: "All", label: "All" });
@@ -67,16 +65,14 @@ const SelectLocation: FC<Props> = ({
 
   useEffect(() => {
     if (locations) {
-      const values = locations.location.map((item: any) => {
-        if (!item?.closed_flag) {
+      let values = locations.location
+        .filter((loc) => !loc.closed_flag)
+        .map((item) => {
           return {
-            label: item.location_name + "-" + item.location_code,
+            label: item.short_name + "-" + item.location_code,
             value: item.location_code,
           };
-        } else {
-          return { value: "", label: "" };
-        }
-      });
+        });
 
       if (isAllValue) {
         values.push({ value: "All", label: "All" });

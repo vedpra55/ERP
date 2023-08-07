@@ -41,13 +41,14 @@ const SelectProductByDep: FC<Props> = ({
       );
 
       if (data?.res) {
-        const values = data.res.products.map((item: any) => {
-          if (!item?.closed_flag) {
-            return { label: item.product_code, value: item.product_code };
-          } else {
-            return { value: "", label: "" };
-          }
-        });
+        let values = data.res.products
+          .filter((pro: any) => !pro.closed_flag)
+          .map((item: any) => {
+            return {
+              label: item.product_code + "-" + item.product_description,
+              value: item.product_code,
+            };
+          });
 
         setProductData(values);
       } else {
@@ -62,16 +63,14 @@ const SelectProductByDep: FC<Props> = ({
 
   useEffect(() => {
     if (products) {
-      const values = products.product.map((item: any) => {
-        if (!item?.closed_flag) {
+      let values = products.product
+        .filter((pro) => !pro.closed_flag)
+        .map((item) => {
           return {
             label: item.product_code + "-" + item.product_description,
             value: item.product_code,
           };
-        } else {
-          return { value: "", label: "" };
-        }
-      });
+        });
 
       setProductData(values);
     } else {

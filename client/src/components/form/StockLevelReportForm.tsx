@@ -107,7 +107,7 @@ const StockLevelReportForm: FC<Props> = ({
   const { user } = useAuthContext();
 
   useEffect(() => {
-    if (parameters.locationCode) {
+    if (parameters.locationCode != "All") {
       fetchSingleLocation(parameters.locationCode, user.access_token).then(
         (item) => {
           if (item) {
@@ -164,18 +164,20 @@ const StockLevelReportForm: FC<Props> = ({
             handleInputChange={handleOnInputChange}
           />
         </div>
-        {selectedLocation != undefined && selectedLocation.length > 0 && (
-          <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
-            {selectedLocation?.map((item) => (
-              <div
-                className="bg-gray-100 rounded-md flex items-center gap-x-2 px-3 py-1"
-                key={item.location_code}
-              >
-                {item.location_name}
-              </div>
-            ))}
-          </div>
-        )}
+        {selectedLocation != undefined &&
+          selectedLocation.length > 0 &&
+          parameters.locationCode != "All" && (
+            <div className="col-span-8 flex flex-wrap gap-x-5 items-center border rounded-md px-5 py-1">
+              {selectedLocation?.map((item) => (
+                <div
+                  className="bg-gray-100 rounded-md flex items-center gap-x-2 px-3 py-1"
+                  key={item.location_code}
+                >
+                  {item.location_name}
+                </div>
+              ))}
+            </div>
+          )}
         <SelecteInputNormal
           data={[{ name: "Yes" }, { name: "No" }, { name: "All" }]}
           accessor="name"

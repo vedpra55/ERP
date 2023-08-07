@@ -18,12 +18,22 @@ export const StockLevelReport = async (req, res, next) => {
 
     let departments;
     let location;
+
+    let departmentWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
+    let locationWhere = {
+      company_id: user.company_id,
+      sub_company_id: user.sub_company_id,
+    };
+
     if (departmentCode[0] === "All") {
       deparmentStatus = "All";
       departments = await Prisma.inv_department.findMany({
         where: {
-          company_id: user.company_id,
-          sub_company_id: user.sub_company_id,
+          ...departmentWhere,
         },
       });
     } else {
@@ -38,8 +48,7 @@ export const StockLevelReport = async (req, res, next) => {
       locStatus = "All";
       location = await Prisma.inv_locations.findMany({
         where: {
-          company_id: user.company_id,
-          sub_company_id: user.sub_company_id,
+          ...locationWhere,
         },
       });
     } else {
@@ -52,6 +61,10 @@ export const StockLevelReport = async (req, res, next) => {
         createHttpError.BadRequest("There is no data for the filters")
       );
     }
+
+    const allDepartments = await getDepartments(user, departments);
+
+    const allLocations = await getLocations(user, location);
 
     const filter = {
       departments,
@@ -173,10 +186,6 @@ export const StockLevelReport = async (req, res, next) => {
       }
     }
 
-    const allDepartments = await getDepartments(user);
-
-    const allLocations = await getLocations(user);
-
     function getDepartmentName(department_code) {
       const name = allDepartments.filter(
         (res) => res.department_code === department_code
@@ -190,7 +199,7 @@ export const StockLevelReport = async (req, res, next) => {
         (res) => res.location_code === location_code
       )[0];
 
-      return name.location_name;
+      return name.short_name;
     }
 
     const productLocationQtyMap = {};
@@ -467,22 +476,33 @@ export const StockLevelReport = async (req, res, next) => {
   }
 };
 
-const getDepartments = async (user) => {
+const getDepartments = async (user, codes) => {
+  let code = codes.map((item) => item.department_code);
+
   const departments = await Prisma.inv_department.findMany({
     where: {
       company_id: user.company_id,
       sub_company_id: user.sub_company_id,
+      department_code: { in: code },
     },
   });
 
   return departments;
 };
 
-const getLocations = async (user) => {
+const getLocations = async (user, codes) => {
+  let locationCodes;
+  if (Array.isArray(codes) && codes.length !== 0) {
+    locationCodes = codes.map((item) => item.location_code);
+  } else {
+    locationCodes = [codes];
+  }
+
   const locations = await Prisma.inv_locations.findMany({
     where: {
       company_id: user.company_id,
       sub_company_id: user.sub_company_id,
+      location_code: { in: locationCodes },
     },
   });
 

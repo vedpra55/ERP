@@ -6,7 +6,7 @@ export async function getSummaryData(filter, user) {
 
   let where = {};
 
-  const departmentCodes = departments.map((dept) => dept.department_code);
+  let departmentCodes = departments.map((dept) => dept.department_code);
   let locationCodes;
 
   if (Array.isArray(location) && location.length !== 0) {
@@ -36,23 +36,31 @@ export async function getSummaryData(filter, user) {
   where.sub_company_id = user.sub_company_id;
   where.company_id = user.company_id;
 
-  console.log(where);
-
   const summaryData = await prisma.inv_stores.findMany({
     where,
-    select: {
-      company_id: true,
-      sub_company_id: true,
-      location_code: true,
-      department_code: true,
-      product_code: true,
-      qty_instock: true,
+    include: {
+      inv_products: true,
     },
   });
 
   function groupDataByDepartment(data) {
     const groupedData = {};
-    data.forEach((item) => {
+
+    let filterData = [];
+
+    if (closed === "Yes") {
+      filterData = data.filter((item) => item.inv_products.closed_flag);
+    }
+
+    if (closed === "No") {
+      filterData = data.filter((item) => !item.inv_products.closed_flag);
+    }
+
+    if (closed === "All") {
+      filterData = data;
+    }
+
+    filterData.forEach((item) => {
       const { department_code, product_code, location_code, qty_instock } =
         item;
       if (!groupedData[department_code]) {

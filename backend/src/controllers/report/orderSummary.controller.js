@@ -75,25 +75,6 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
       }
     });
 
-    //const products = [];
-
-    async function fetchProducts() {
-      const products = summary.flatMap(async (summaryItem) => {
-        return await Promise.all(
-          summaryItem.purchaseOrderDetails.map(async (item2) => {
-            return await fethProduct(
-              item2.product_code,
-              item2.department_code,
-              user
-            );
-          })
-        );
-      });
-
-      return await Promise.all(products);
-    }
-    const products = await fetchProducts();
-
     // Launch a headless browser
     const browser = await puppeteer.launch();
 
@@ -269,7 +250,7 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
                <td>${item2.serial_no}</td>
                <td>${item2.department_code}</td>
                <td>${item2.product_code}</td>
-               <td>${products[index][i].product_description}</td>
+               <td>${item2.inv_products.product_description}</td>
                <td class="alignRight">${item2.cost_fc}</td>
                <td class="alignRight">${item2.qty_ordered}</td>
                <td class="alignRight">${item2.cost_fc * item2.qty_ordered}</td>
@@ -398,6 +379,9 @@ async function getPdfData(
         sub_company_id: parseInt(subCompanyId),
         order_no: purchaseOrder[i].order_no,
       },
+      include: {
+        inv_products: true,
+      },
     });
     purchaseOrderDetails.push(d);
   }
@@ -407,18 +391,3 @@ async function getPdfData(
     purchaseOrderDetails,
   };
 }
-
-const fethProduct = async (productId, departmentCode, user) => {
-  const product = await Prisma.inv_products.findUnique({
-    where: {
-      company_id_sub_company_id_department_code_product_code: {
-        company_id: user.company_id,
-        sub_company_id: user.sub_company_id,
-        product_code: productId,
-        department_code: departmentCode,
-      },
-    },
-  });
-
-  return product;
-};

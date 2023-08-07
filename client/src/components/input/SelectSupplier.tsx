@@ -39,16 +39,14 @@ const SelectSupplier: FC<Props> = ({
       );
 
       if (data?.res) {
-        let values = data.res.suppliers.map((item: any) => {
-          if (!item?.closed_flag) {
+        let values = data.res.suppliers
+          .filter((sup: any) => !sup.closed_flag)
+          .map((item: any) => {
             return {
               label: item.supplier_name + "-" + item.supplier_code,
               value: item.supplier_code,
             };
-          } else {
-            return { value: "", label: "" };
-          }
-        });
+          });
 
         if (isAllValue) {
           values.push({ value: "All", label: "All" });
@@ -67,16 +65,14 @@ const SelectSupplier: FC<Props> = ({
 
   useEffect(() => {
     if (suppliers) {
-      let values = suppliers.supplier.map((item: any) => {
-        if (!item?.closed_flag) {
+      let values = suppliers.supplier
+        .filter((sup) => !sup.closed_flag)
+        .map((item) => {
           return {
             label: item.supplier_name + "-" + item.supplier_code,
             value: item.supplier_code,
           };
-        } else {
-          return { value: "", label: "" };
-        }
-      });
+        });
 
       if (isAllValue) {
         values.push({ value: "All", label: "All" });
