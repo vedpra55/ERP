@@ -86,7 +86,7 @@ export const createPurchaseOrder = async (req, res, next) => {
         let costLocal = 0;
 
         if (costRate) {
-          costLocal = parseFloat(products[i].unitPrice) + parseFloat(costRate);
+          costLocal = parseFloat(products[i].unitPrice) * parseFloat(costRate);
         } else {
           costLocal = parseFloat(products[i].unitPrice);
         }
@@ -96,7 +96,7 @@ export const createPurchaseOrder = async (req, res, next) => {
             company_id: parseInt(user.company_id),
             sub_company_id: user.sub_company_id,
             order_no: orderNo,
-            serial_no: products[i].serialNo,
+            serial_no: parseInt(products[i].srl),
             department_code: products[i].departmentCode,
             product_code: products[i].productCode,
             qty_ordered: parseInt(products[i].qtyBackorder),
@@ -268,22 +268,25 @@ export const handleOrderFullFill = async (req, res, next) => {
         }
 
         costFc = costFcT;
+        costLocal = costLocalT;
+
+        console.log(costLocal, "cost local");
 
         // Caluclating Avarage Cost if qty > 0 in pod
         if (storeQtyInStock._sum.qty_instock > 0) {
           const { averageCost } = calulateAvarageNumber(
             storeQtyInStock._sum.qty_instock,
-            myProduct.cost_price,
-            costLocalT,
-            parseInt(product.qty_ordered)
+            parseFloat(myProduct.cost_price),
+            costLocal,
+            parseFloat(product.qty_ordered)
           );
-          costLocal = averageCost;
-        } else {
-          costLocal = costLocalT;
-        }
 
-        if (costLocal === null) {
-          return next(createHttpError.BadRequest("No cost price 2 again"));
+          console.log(averageCost, "costpricesdsads");
+
+          if (averageCost === 0) costFc = 0;
+          else {
+            costLocal = averageCost;
+          }
         }
 
         /// Update costfc and costLocal in pod
@@ -293,11 +296,14 @@ export const handleOrderFullFill = async (req, res, next) => {
               company_id: user.company_id,
               sub_company_id: user.sub_company_id,
               order_no: orderNo,
-              serial_no: product.serial_no,
+
+              serial_no: parseInt(product.serial_no),
             },
           },
           data: {
             qty_received: product.qty_ordered,
+            cost_fc: costFc,
+            cost_local: costLocal,
           },
         });
 

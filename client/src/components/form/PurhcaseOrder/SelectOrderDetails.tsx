@@ -23,7 +23,7 @@ const SelectOrderDetails: FC<Props> = ({
     const list = [...orderDetailsRow];
 
     const list2 = [...orderDetailsRow];
-    list2[index]["srl"] = index.toString();
+    list2[index]["srl"] = (index + 1).toString();
 
     if (name === "departmentCode") {
       list[index]["departmentCode"] = value;

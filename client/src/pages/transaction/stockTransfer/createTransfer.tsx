@@ -47,6 +47,16 @@ const CreateTransferPage: FC<Props> = ({}) => {
   ]);
 
   const onSubmit = async (data: StockTransferFormValues) => {
+    if (!fromLocation) {
+      toast.error("Please select from location");
+      return;
+    }
+
+    if (!toLocation) {
+      toast.error("Please select to location");
+      return;
+    }
+
     if (fromLocation.value === toLocation.value) {
       toast.error("Both locations are same");
       return;

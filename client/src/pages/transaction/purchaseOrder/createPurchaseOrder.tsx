@@ -50,12 +50,12 @@ const CreatePurchaseOrder = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data: purchaseOrderFormValues) => {
-    if (!selectedSupplier.value) {
+    if (!selectedSupplier) {
       toast.error("Please select supplier code");
       return;
     }
 
-    if (!selectedLocation.value) {
+    if (!selectedLocation) {
       toast.error("Please select location code");
       return;
     }
@@ -81,6 +81,48 @@ const CreatePurchaseOrder = () => {
       return;
     }
 
+    let myFreight = 0;
+    if (freight) {
+      myFreight = parseFloat(freight.toString());
+    }
+
+    const total = parseFloat(subTotal.toString()) + myFreight;
+
+    console.log(total, "total order value");
+
+    let myNonVendorCost = 0;
+    if (data.nonVendorCost) {
+      myNonVendorCost = (data.nonVendorCost / 100) * total;
+    }
+
+    console.log(myNonVendorCost.toFixed(2), "non vendor cosot value");
+
+    for (let i = 0; i < ordersData.length; i++) {
+      const product = ordersData[i];
+
+      const cost_fc = parseFloat(product.value.toString());
+
+      const freightValue = (cost_fc / subTotal) * myFreight;
+
+      const perItemFreight = freightValue / product.qtyBackorder;
+
+      const nonVendorCostValue =
+        (cost_fc / total) * parseFloat(myNonVendorCost.toFixed(2));
+
+      const perItemNonVendorCostValue =
+        nonVendorCostValue / product.qtyBackorder;
+
+      const cost_fcPerItem =
+        parseFloat(product.unitPrice.toString()) +
+        parseFloat(perItemFreight.toString()) +
+        parseFloat(perItemNonVendorCostValue.toString());
+
+      console.log(cost_fcPerItem, "cost_fc per item");
+
+      console.log(freightValue, "feight");
+      console.log(nonVendorCostValue, "non vendor distrubuin value");
+    }
+
     const items = {
       ...data,
       supplierCode: selectedSupplier.value,
@@ -89,7 +131,7 @@ const CreatePurchaseOrder = () => {
       paidAmount: 0,
       orderDate: new Date().toISOString(),
       dueDate: new Date(data.dueDate).toISOString(),
-      total: freight ? parseInt(freight.toString()) + subTotal : subTotal,
+      total: freight ? parseFloat(freight.toString()) + subTotal : subTotal,
     };
 
     await createPurchaseOrderMutation.mutateAsync(items);

@@ -130,6 +130,12 @@ export const getAllProducts = async (req, res, next) => {
               },
             },
             { department_code: { in: codes } },
+            {
+              department_code: {
+                contains: searchText,
+                mode: "insensitive",
+              },
+            },
           ],
         },
       ];

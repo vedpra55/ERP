@@ -103,8 +103,6 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
           margin: 0;
         }
         .mainContainer {
-          margin-left: 25px;
-          margin-right: 25px;
           margin-bottom: 50px;
         }
         .infoContainer {
@@ -127,6 +125,7 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
         table {
           width: 100%;
           border-collapse: collapse;
+    
         }
   
         th {
@@ -206,8 +205,8 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
              .map(
                (item, index) => `
      
-           <thead class="darkHeading">
-             <tr>
+
+             <tr class="darkHeading">
                <th>Supplier</th>
                <th colspan="2">Name</th>
                <th>Order#</th>
@@ -216,7 +215,7 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
                <th>Paid</th>
                <th colspan="2">Balance</th>
              </tr>
-           </thead>
+
            <tbody>
              <tr>
                <td>${supplier.supplier_code}</td>
@@ -291,7 +290,14 @@ export const PurchaseOrderSummaryPdf = async (req, res, next) => {
     await page.setContent(htmlContent);
 
     // Generate the PDF
-    const pdf = await page.pdf();
+    const pdf = await page.pdf({
+      margin: {
+        top: "20px",
+        bottom: "20px",
+        left: "20px",
+        right: "20px",
+      },
+    });
 
     // Set the response headers for PDF
     res.setHeader("Content-Type", "application/pdf");

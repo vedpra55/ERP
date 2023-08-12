@@ -41,7 +41,7 @@ model inv_cardex {
   trans_dt                                                                        DateTime?      @db.Date
   trans_no                                                                        String?        @db.VarChar(20)
   trans_type                                                                      String?        @db.VarChar(255)
-  serial_no                                                                       Int            @default(autoincrement())
+  serial_no                                                                       Int
   department_code                                                                 String?        @db.VarChar(3)
   product_code                                                                    String?        @db.VarChar(10)
   quantity                                                                        Int?
@@ -163,7 +163,7 @@ model inv_purchase_order_detail {
   company_id         Int
   sub_company_id     Int
   order_no           String             @db.VarChar(20)
-  serial_no          Int                @default(autoincrement())
+  serial_no          Int
   department_code    String?            @db.VarChar(3)
   product_code       String?            @db.VarChar(10)
   qty_ordered        Int?

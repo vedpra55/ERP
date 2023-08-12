@@ -15,31 +15,40 @@ export const calulatePurhcaseOrderNumbers = (
   subTotal,
   total
 ) => {
-  console.log(costRate, freight, supplierCostRate, total, product, "service");
-
   const unitPrice = parseFloat(product.cost_fc);
-  const qty = parseInt(product.qty_ordered);
+  let qty = parseInt(product.qty_ordered);
+  qty = Math.abs(qty);
 
   const productValue = unitPrice * qty;
 
+  const newTotal = Math.abs(subTotal) + freight;
+
   let freightValue = 0;
   if (freight) {
-    freightValue = (parseFloat(productValue) / subTotal) * freight;
+    freightValue = (parseFloat(productValue) / Math.abs(subTotal)) * freight;
+    freightValue = freightValue / qty;
   }
 
   let supplierCostValue = 0;
   if (supplierCostRate) {
-    supplierCostValue = (supplierCostRate / 100) * total;
+    supplierCostValue = (supplierCostRate / 100) * newTotal;
   }
 
-  const nonVendorCostWeightage =
-    (parseFloat(productValue) / total) * parseFloat(supplierCostValue);
+  let nonVendorCostWeightage =
+    (parseFloat(productValue) / newTotal) * parseFloat(supplierCostValue);
 
-  const itemValue = unitPrice * qty + (nonVendorCostWeightage + freightValue);
+  nonVendorCostWeightage = nonVendorCostWeightage / qty;
 
-  const costFc = itemValue / qty;
+  const itemValue =
+    unitPrice +
+    (parseFloat(nonVendorCostWeightage.toString()) +
+      parseFloat(freightValue.toString()));
+
+  const costFc = itemValue;
 
   const costLocal = costFc * costRate;
+
+  console.log(costRate, costFc, "cost rate", "cost fc");
 
   return {
     costFc,
@@ -55,10 +64,15 @@ export const calulateAvarageNumber = (
 ) => {
   console.log(existingQty, costLocal, newCostLocal, newQty, "avarage");
 
-  const qty_received = existingQty;
-  const productTotal = qty_received * costLocal;
+  const qty_stored = existingQty;
+
+  const productTotal = qty_stored * costLocal;
+
   const newValue = newQty * newCostLocal;
-  const totalQty = qty_received + newQty;
+
+  const totalQty = qty_stored + newQty;
+
+  console.log(totalQty, "total qty");
 
   let averageCost = (productTotal + newValue) / totalQty;
 

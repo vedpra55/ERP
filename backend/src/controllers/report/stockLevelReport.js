@@ -1,5 +1,5 @@
 import Prisma from "../../../prisma/index.js";
-import { getSummaryData } from "../filterData.js";
+import { getStockLevelReporData } from "../filterData.js";
 import createHttpError from "http-errors";
 import puppeteer from "puppeteer";
 
@@ -18,6 +18,8 @@ export const StockLevelReport = async (req, res, next) => {
 
     let departments;
     let location;
+
+    let locationName;
 
     let departmentWhere = {
       company_id: user.company_id,
@@ -54,6 +56,16 @@ export const StockLevelReport = async (req, res, next) => {
     } else {
       locStatus = locationCode;
       location = locationCode;
+
+      locationName = await Prisma.inv_locations.findUnique({
+        where: {
+          company_id_sub_company_id_location_code: {
+            company_id: user.company_id,
+            sub_company_id: user.sub_company_id,
+            location_code: locationCode,
+          },
+        },
+      });
     }
 
     if (!location || location?.length === 0 || departments?.length === 0) {
@@ -73,7 +85,7 @@ export const StockLevelReport = async (req, res, next) => {
       status,
     };
 
-    const { summaryData, result } = await getSummaryData(filter, user);
+    const { summaryData, result } = await getStockLevelReporData(filter, user);
 
     if (summaryData.length === 0) {
       return next(
@@ -258,12 +270,10 @@ export const StockLevelReport = async (req, res, next) => {
       margin: 0;
     }
     .mainContainer {
-      margin-left: 25px;
-      margin-right: 25px;
       margin-bottom: 50px;
     }
     .infoContainer {
-      margin-top: 40px;
+      margin-top: 10px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
@@ -318,31 +328,9 @@ export const StockLevelReport = async (req, res, next) => {
   </head>
   <body>
     <main class="mainContainer">
-      <section style="margin-top: 20px">
-        <h2 style="text-align: center">${company.company_name}</h2>
-        <h4 style="text-align: center; margin-top: 10px">
-          Stock Levels Report
-        </h4>
+      <section style="margin-top: 10px">
       </section>
       <section class="infoContainer">
-        <div>
-          <div class="queryDataContainer">
-            <p>Location</p>
-            <p style="font-weight: 400">${locStatus}</p>
-          </div>
-          <div class="queryDataContainer">
-            <p>Department</p>
-            <p style="font-weight: 400">${deparmentStatus}</p>
-          </div>
-          <div class="queryDataContainer">
-            <p>Closed</p>
-            <p style="font-weight: 400">All</p>
-          </div>
-          <div class="queryDataContainer">
-            <p>Status</p>
-            <p style="font-weight: 400">${status.type} ${status.value}</p>
-          </div>
-        </div>
         <div style="font-weight: 600">
           <p>Date : <span style="margin-left: 30px;font-weight: 400">28/06/2023</span></p>
         </div>
@@ -353,8 +341,8 @@ export const StockLevelReport = async (req, res, next) => {
           ${result
             .map(
               (mainItem, index) => `
-          <thead class="darkHeading">
-          <tr>
+   
+          <tr class="darkHeading">
             <th style="width: 20px" colspan="1">Department</th>
             <th style="width: 100px" colspan="1">${
               mainItem.department_code
@@ -364,7 +352,7 @@ export const StockLevelReport = async (req, res, next) => {
             }>${getDepartmentName(mainItem.department_code)}</th>
             <th class="1"></th>
           </tr>
-        </thead>
+      
         <tbody>
           <tr>
             <td></td>
@@ -458,8 +446,46 @@ export const StockLevelReport = async (req, res, next) => {
     // Set the content of the page
     await page.setContent(htmlContent);
 
-    // Generate the PDF
-    const pdf = await page.pdf();
+    const pdf = await page.pdf({
+      displayHeaderFooter: true,
+      headerTemplate: `
+      <div style="  font-family : sans-serif;  border: 0px solid; width: 100%; height: 200px; margin-left : 20px;">
+      <div style = " padding-bottom: 3px;   font-weight : bold; font-size : 16px; text-align : center "> ${
+        company.company_name
+      } </div>
+      <div style = " font-weight : 500; font-size : 12px; text-align : center "> Stock Level Report </div>
+      <div style =   " padding-top : 2px "  >
+      <div style = "  padding-bottom : 2px; margin; 0; font-size : 8px "> <span style=  "  font-weight : bold ">Location</span> : ${
+        locStatus != "All"
+          ? `${locationName.location_code} ${locationName.location_name}`
+          : `All`
+      } </div>
+      <div style = "  padding-bottom : 2px; margin; 0; font-size : 8px "> <span style=  "  font-weight : bold ">Department</span>  : ${
+        departments?.length === 1
+          ? `
+      ${departments[0].department_code} ${departments[0].department_name} 
+        `
+          : `All`
+      } </div>
+      <div style = "  padding-bottom : 2px; margin; 0; font-size : 8px "><span style="font-weight : bold ">Closed</span>  : ${closed} </div>
+      <div style = "  padding-bottom : 2px; margin; 0; font-size : 8px "><span style="font-weight : bold ">Status</span> : ${
+        status.type
+      } ${status.value} </div>
+      </div>
+      </div>
+      `,
+      footerTemplate: `
+    <div style=" margin-left : 300px; margin-top-10px; padding-top-10px; text-align : center; font-size: 10px;">
+        <div ><span style=" text-align : center"  class="pageNumber"></span></div>
+    </div>
+  `,
+      margin: {
+        top: "140px",
+        bottom: "20px",
+        left: "20px",
+        right: "20px",
+      },
+    });
 
     // Set the response headers for PDF
     res.setHeader("Content-Type", "application/pdf");

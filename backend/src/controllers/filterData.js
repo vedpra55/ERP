@@ -2,7 +2,7 @@
 import createHttpError from "http-errors";
 import prisma from "../../prisma/index.js";
 
-export async function getSummaryData(filter, user) {
+export async function getStockLevelReporData(filter, user) {
   const { departments, location, closed, status } = filter;
 
   let where = {};

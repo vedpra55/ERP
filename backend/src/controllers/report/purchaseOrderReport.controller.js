@@ -64,10 +64,9 @@ export const purchaseOrderPdf = async (req, res, next) => {
           margin: 0;
         }
         .mainContainer {
-          margin-left: 25px;
-          margin-right: 25px;
-          margin-bottom: 100px;
+          margin-bottom: 50px;
         }
+    
         .infoContainer {
           margin-top: 40px;
           margin-bottom: 20px;
@@ -181,10 +180,10 @@ export const purchaseOrderPdf = async (req, res, next) => {
             <tr>
               <th style="width: 10%">Srl</th>
               <th style="width: 10%">Department</th>
-              <th style="width: 30%">Product</th>
-              <th style="width: 10%">Description</th>
-              <th style="width: 20%">Unit Price</th>
-              <th style="width: 10%">Quantity</th>
+              <th style="width: 20%">Product</th>
+              <th style="width: 20%">Description</th>
+              <th style="width: 15%">Unit Price</th>
+              <th style="width: 10%">Qty</th>
               <th style="width: 15%">Value</th>
             </tr>
           </thead>
@@ -193,19 +192,19 @@ export const purchaseOrderPdf = async (req, res, next) => {
             .map(
               (item, i) =>
                 `
-            <tbody>
-            <tr>
-              <td>${item.serial_no}</td>
-              <td>${item.department_code}</td>
-              <td>${item.product_code}</td>
-              <td>${products[i].product_description}</td>
-              <td class="alignRight">${item.cost_fc}</td>
-              <td class="alignRight">${item.qty_ordered}</td>
-              <td class="alignRight">${
-                parseInt(item.cost_fc) * parseInt(item.qty_ordered)
-              }</td>
-            </tr>
-          </tbody>
+        <tbody>
+          <tr>
+            <td>${item.serial_no}</td>
+            <td>${item.department_code}</td>
+            <td>${item.product_code}</td>
+            <td>${products[i].product_description}</td>
+            <td class="alignRight">${item.cost_fc}</td>
+            <td class="alignRight">${item.qty_ordered}</td>
+            <td class="alignRight">${
+              parseInt(item.cost_fc) * parseInt(item.qty_ordered)
+            }</td>
+          </tr>
+        </tbody>
             `
             )
             .join(" ")}
@@ -232,7 +231,22 @@ export const purchaseOrderPdf = async (req, res, next) => {
     await page.setContent(htmlContent);
 
     // Generate the PDF
-    const pdf = await page.pdf();
+    const pdf = await page.pdf({
+      displayHeaderFooter: true,
+      footerTemplate: `
+      <div style=" margin-left : 300px; margin-top-10px; padding-top-10px; text-align : center; font-size: 10px;">
+          <div ><span style=" text-align : center"  class="pageNumber"></span></div>
+      </div>`,
+      margin: {
+        top: "100px",
+        bottom: "20px",
+        left: "20px",
+        right: "20px",
+      },
+    });
+
+    // Close the browser
+    await browser.close();
 
     // Set the response headers for PDF
     res.setHeader("Content-Type", "application/pdf");
@@ -240,9 +254,6 @@ export const purchaseOrderPdf = async (req, res, next) => {
 
     // Send the generated PDF to the client
     res.send(pdf);
-
-    // Close the browser
-    await browser.close();
   } catch (err) {
     console.log(err);
     next(err);
